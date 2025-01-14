@@ -15,21 +15,23 @@ const Create: React.FC = () => {
     .find((item) => item.id === Number(id));
 
   return (
-    <div className="relative flex flex-col">
-      <div className={`${category?.color} flex h-[150px] flex-col`}>
-        <div className="flex gap-[68px]">
-          <Link to={`/card/${card?.id}`}>
+    <div className="flex h-screen flex-col">
+      <div className={`${category?.color} h-[18%]`}>
+        <div className="relative mb-2 mt-5 flex w-full">
+          <Link to={`/card/${card?.id}`} className="absolute inset-0">
             <img src={CrossImg} alt="cross" className="m-2 h-10 w-10" />
           </Link>
-          <span className="mt-[15.5px] text-black">New challenge</span>
+          <span className="mt-[15.5px] w-full text-center text-black">
+            New challenge
+          </span>
         </div>
         <div className="flex flex-col pl-5 text-start text-black">
-          <span className="mb-4 text-xs font-light">Title</span>
+          <span className="mb-4 text-sm">Title</span>
           <span className="text-xl font-bold">{card?.title}</span>
         </div>
       </div>
       <div className="flex flex-col pl-5 pt-4 text-start">
-        <span>Terms</span>
+        <span className="mb-2 text-gray-300">Terms</span>
       </div>
       <div className="flex items-center justify-center">
         <Modal />

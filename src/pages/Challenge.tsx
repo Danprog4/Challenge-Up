@@ -19,7 +19,7 @@ const Challenge: React.FC = () => {
         <img
           src={card?.imageUrl}
           alt={card?.title}
-          className={`h-[450px] ${category?.color} rounded-3xl`}
+          className={`h-[450px] ${category?.color} rounded-b-3xl`}
         />
         <Link to={"/"} className="absolute right-0 top-0 z-10 m-2 h-8 w-8">
           <img
