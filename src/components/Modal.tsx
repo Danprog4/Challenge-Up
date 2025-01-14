@@ -23,8 +23,6 @@ export default function VaulDrawer() {
     }
   };
 
-  console.log(regularity);
-
   return (
     <Drawer.Root>
       <Drawer.Trigger className="flex w-[90vw] justify-between rounded-md bg-gray-700 p-[10px]">
@@ -141,12 +139,13 @@ export default function VaulDrawer() {
                   </div>
                 </div>
               )}
-              {daysOfWeek.length > 0 && daysOfWeek.length !== 7 ? (
+              {daysOfWeek.length > 0 && daysOfWeek.length <= 6 && (
                 <div className="mt-3 w-[90vw] text-wrap text-start text-sm font-light">
                   Challenge wiil be repeated every week in the next <br /> days:{" "}
                   {daysOfWeek.join(", ").toLowerCase()},
                 </div>
-              ) : (
+              )}
+              {daysOfWeek.length === 7 && regularity !== "Everyday" && (
                 <div className="mt-3 w-[90vw] text-start text-sm font-light">
                   Challenge will be repeated every day
                 </div>
