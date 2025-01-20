@@ -28,22 +28,24 @@ const Challenge: React.FC = () => {
             className="rounded-full bg-white opacity-50"
           />
         </Link>
-        <div className="absolute inset-0 flex flex-col pl-2 pt-7 text-start">
+        <div className="absolute inset-0 flex flex-col pl-[14px] pt-10 text-start">
           <span className="text-sm text-white">Challenge</span>
           <span className="text-2xl font-bold text-black">{card?.title}</span>
         </div>
-        <div className="absolute bottom-0 left-0 flex p-2">
+        <div className="absolute bottom-0 left-0 flex pb-4 pl-[14px]">
           {card?.duration?.map((dur) => (
-            <div className="m-2 flex h-[55px] w-[55px] flex-col items-center justify-center rounded-full bg-black bg-cover">
+            <div className="flex h-[70px] w-[70px] flex-col items-center justify-center rounded-full bg-black bg-cover">
               <div className="text-center">
-                <div className="font-extrabold">{dur}</div>
-                <div className="mt-[-5px] text-[10px] font-light">DAYS</div>
+                <div className="text-[20px] font-extrabold">{dur}</div>
+                <div className="mb-1 mt-[-5px] text-[10px] font-light">
+                  DAYS
+                </div>
               </div>
             </div>
           ))}
         </div>
         <div className="absolute bottom-0 right-0 p-2">
-          <div className="m-2 flex h-[55px] w-[55px] flex-col items-center justify-center rounded-full bg-black bg-cover">
+          <div className="m-2 flex h-[70px] w-[70px] flex-col items-center justify-center rounded-full bg-black bg-cover">
             <div className="text-start text-[10px] font-light">
               EVERY <br></br> DAY
             </div>
@@ -51,35 +53,35 @@ const Challenge: React.FC = () => {
         </div>
       </div>
       <div className="p-2">
-        <p className="mb-7 mt-4 text-start text-sm text-gray-400">
+        <p className="mb-7 mt-4 text-start text-lg text-gray-300">
           Lorem ipsum dolor sit amet consectetur ernatur molestias tempore.
           Rerum odio nam debitis. Aspernatur nam magni qui quas totam esse at
           tempore veniam sit?
         </p>
         <div className="text-start">
-          <span className="text-xl font-bold">HINTS AND TIPS</span>
-          <div className="mt-3 flex gap-2 text-sm font-light text-gray-400">
+          <span className="text-2xl font-bold">HINTS AND TIPS</span>
+          <div className="mt-3 flex gap-2 text-lg font-light text-gray-300">
             <span className="inline-block font-bold text-white">-</span>
             <p>
               Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi,
               eum.
             </p>
           </div>
-          <div className="mt-3 flex gap-2 text-sm font-light text-gray-400">
+          <div className="mt-3 flex gap-2 text-lg font-light text-gray-300">
             <span className="inline-block font-bold text-white">-</span>
             <p>
               Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi,
               eum.
             </p>
           </div>
-          <div className="mt-3 flex gap-2 text-sm font-light text-gray-400">
+          <div className="mt-3 flex gap-2 text-lg font-light text-gray-300">
             <span className="inline-block font-bold text-white">-</span>
             <p>
               Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi,
               eum.
             </p>
           </div>
-          <div className="mt-3 flex gap-2 text-sm font-light text-gray-400">
+          <div className="mb-20 mt-3 flex gap-2 text-lg font-light text-gray-300">
             <span className="inline-block font-bold text-white">-</span>
             <p>
               Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi,
@@ -88,12 +90,14 @@ const Challenge: React.FC = () => {
           </div>
         </div>
       </div>
-      <Link
-        to={`/card/${card?.id}/create`}
-        className="sticky bottom-0 flex h-[20px] items-center justify-center rounded-lg bg-pink-600 p-5"
-      >
-        <div className="">CONTINUE</div>
-      </Link>
+      <div className="flex items-center justify-center pl-0 font-extrabold">
+        <Link
+          to={`/card/${card?.id}/create`}
+          className="fixed bottom-[10px] flex h-[45px] w-[95vw] items-center justify-center rounded-lg bg-pink-600 p-5"
+        >
+          <div className="">CONTINUE</div>
+        </Link>
+      </div>
     </div>
   );
 };

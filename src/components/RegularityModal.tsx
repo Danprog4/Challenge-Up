@@ -4,15 +4,27 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Drawer } from "vaul";
 
-export default function VaulDrawer() {
-  const [regularity, setRegularity] = useState("Everyday");
-  const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
+interface RegProps {
+  regularity: string;
+  setRegularity: (value: string) => void;
+  daysOfWeek: string[]
+  setDaysOfWeek: (value: string[]) => void;
+}
+
+export default function VaulDrawer({
+  regularity,
+  setRegularity,
+  daysOfWeek,
+  setDaysOfWeek,
+}: RegProps) {
+
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleChangleRegularity = (option: string) => {
     if (option === "Everyday") {
       setDaysOfWeek([]);
     }
-    setRegularity(option);
+    setRegularity(option.toString());
   };
 
   const handleToggle = (day: string) => {
@@ -23,8 +35,10 @@ export default function VaulDrawer() {
     }
   };
 
+  console.log(daysOfWeek);
+
   return (
-    <Drawer.Root>
+    <Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
       <Drawer.Trigger className="flex w-[90vw] justify-between rounded-md bg-gray-700 p-[10px]">
         <span>Regularity</span>
         <span className="text-gray-400">
@@ -42,7 +56,7 @@ export default function VaulDrawer() {
             </div>
             <div className="flex flex-col items-center justify-center text-gray-300">
               <RadioGroup
-                defaultValue="Everyday"
+                defaultValue={regularity}
                 onValueChange={(value) => handleChangleRegularity(value)}
               >
                 <RadioGroupItem
@@ -142,7 +156,7 @@ export default function VaulDrawer() {
               {daysOfWeek.length > 0 && daysOfWeek.length <= 6 && (
                 <div className="mt-3 w-[90vw] text-wrap text-start text-sm font-light">
                   Challenge wiil be repeated every week in the next <br /> days:{" "}
-                  {daysOfWeek.join(", ").toLowerCase()},
+                  {daysOfWeek.join(", ").toLowerCase()}
                 </div>
               )}
               {daysOfWeek.length === 7 && regularity !== "Everyday" && (
@@ -150,6 +164,14 @@ export default function VaulDrawer() {
                   Challenge will be repeated every day
                 </div>
               )}
+            </div>
+            <div
+              className="flex items-center justify-center pl-0 font-extrabold"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              <div className="fixed bottom-[10px] flex h-[45px] w-[95vw] items-center justify-center rounded-lg bg-yellow-300 p-5">
+                <span>DONE</span>
+              </div>
             </div>
           </div>
         </Drawer.Content>

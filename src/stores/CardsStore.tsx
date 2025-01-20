@@ -29,7 +29,7 @@ interface Category {
   items: Card[];
 }
 
-const useCardsStore = create<CardsStore>((set) => ({
+const useCardsStore = create<CardsStore>(() => ({
   categories: [
     {
       title: "Routine",
@@ -66,23 +66,23 @@ const useCardsStore = create<CardsStore>((set) => ({
     {
       title: "Lifestyle",
       items: [
-        { id: 3, title: "RUN EVERY DAY", imageUrl: RunImg, duration: [30] },
-        { id: 4, title: "COOKING MARATHON", imageUrl: CookImg, duration: [30] },
+        { id: 6, title: "RUN EVERY DAY", imageUrl: RunImg, duration: [30] },
+        { id: 7, title: "COOKING MARATHON", imageUrl: CookImg, duration: [30] },
       ],
       color: "bg-orange-300",
     },
     {
       title: "Awareness",
       items: [
-        { id: 3, title: "BE VEGETARIAN", imageUrl: VegImg, duration: [30, 90] },
+        { id: 8, title: "BE VEGETARIAN", imageUrl: VegImg, duration: [30, 90] },
         {
-          id: 4,
-          title: "MEET WITH YOUR FRIENDS",
+          id: 9,
+          title: "MEET FRIENDS",
           imageUrl: FriendsImg,
           duration: [7, 15, 30],
         },
         {
-          id: 5,
+          id: 10,
           title: "PLAY WITH YOUR PET",
           imageUrl: DogImg,
           duration: [30],

@@ -23,9 +23,9 @@ const Slider: React.FC = () => {
                 <img
                   src={card.imageUrl}
                   alt={card.title}
-                  className="h-[210px] w-[210px] object-contain"
+                  className="h-[250px] w-[250px] object-contain"
                 />
-                <div className="absolute inset-0 p-1 text-start font-bold text-black">
+                <div className="absolute inset-0 z-10 p-3 text-start text-[24px] font-bold leading-7 text-black">
                   {card.title}
                 </div>
               </Link>
