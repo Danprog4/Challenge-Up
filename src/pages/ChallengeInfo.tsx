@@ -1,12 +1,11 @@
 import { useTasksStore } from "@/stores/TasksStore";
 import React from "react";
 import { Link, useParams } from "react-router-dom";
-import BackImg from "../assets/images/Back.png";
 
 const ChallengeInfo: React.FC = () => {
   const { getTaskbyId } = useTasksStore();
-  const { id } = useParams<{ id: string }>();
-  const task = getTaskbyId(id!);
+  const { taskId } = useParams<{ taskId: string }>();
+  const task = getTaskbyId(taskId!);
   const days = Array.from(
     { length: task?.duration || 30 },
     (_, index) => index + 1,
@@ -23,7 +22,7 @@ const ChallengeInfo: React.FC = () => {
               Back
             </Link>
             <span>Challenge</span>
-            <Link to={`/card/${task.id}/create`} className="w-[30px]">
+            <Link to={`/update/${task.id}`} className="w-[30px]">
               Sett
             </Link>
           </div>

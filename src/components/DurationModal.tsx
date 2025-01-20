@@ -7,7 +7,6 @@ import { Drawer } from "vaul";
 
 interface DurProps {
   duration: number;
-  taskId: string;
   setDuration: (value: number) => void;
 }
 

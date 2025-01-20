@@ -12,10 +12,8 @@ import { Colors } from "@/bgColors";
 
 const Create: React.FC = () => {
   const navigate = useNavigate();
-  const { tasks, getTaskbyId, addTask, updateTask } = useTasksStore();
+  const { addTask } = useTasksStore();
   const { id } = useParams<{ id: string }>();
-  const taskId = crypto.randomUUID();
-  const task = getTaskbyId(taskId);
   const { categories } = useCardsStore();
 
   const category = categories.find((category) =>
@@ -25,21 +23,13 @@ const Create: React.FC = () => {
     .flatMap((category) => category.items)
     .find((item) => item.id === Number(id));
 
-  const [isNotifications, setIsNotifications] = useState(
-    task?.notifications || false,
-  );
-  const [notifications, setNotifications] = useState(
-    task?.notificationText || "Motivate yourself",
-  );
-  const [color, setColor] = useState<string>(
-    task?.color || category?.color || "bg-pink-200",
-  );
-  const [duration, setDuration] = useState(task?.duration || 30);
-  const [regularity, setRegularity] = useState(task?.regularity || "Every day");
-  const [date, setDate] = React.useState<Date | undefined>(task?.date);
-  const [daysOfWeek, setDaysOfWeek] = useState<string[]>(
-    task?.daysOfWeek || [],
-  );
+  const [isNotifications, setIsNotifications] = useState(false);
+  const [notifications, setNotifications] = useState("Motivate yourself");
+  const [color, setColor] = useState(category?.color || "bg-pink-200");
+  const [duration, setDuration] = useState(30);
+  const [regularity, setRegularity] = useState("Every day");
+  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
 
   const handleClick = () => {
     if (notifications === "Motivate yourself") {
@@ -57,27 +47,21 @@ const Create: React.FC = () => {
 
   const handleSave = () => {
     const taskData = {
-      id: taskId,
+      id: crypto.randomUUID(),
       title: card?.title || "CHALLENGE NAME",
-      color: color || "bg-pink-200",
+      color,
       notifications: isNotifications,
       notificationText: notifications,
-      duration: duration,
-      regularity: regularity,
-      date: date,
-      daysOfWeek: daysOfWeek,
+      duration,
+      regularity,
+      date,
+      daysOfWeek,
     };
 
-    if (!task) {
-      addTask(taskData);
-    } else {
-      updateTask(taskId, taskData);
-    }
-
+    addTask(taskData);
     navigate("/");
   };
 
-  console.log(tasks);
   return (
     <div className="flex h-screen flex-col">
       <div className={`${color} h-[23%]`}>
@@ -91,9 +75,9 @@ const Create: React.FC = () => {
         </div>
         <div className="flex flex-col pl-5 text-start text-black">
           <span className="mt-4 text-sm">Title</span>
-          <span className="mt-3 text-2xl font-extrabold">
-            {task?.title || "CHALLENGE NAME" || card?.title}
-          </span>
+          <div className="mt-3 text-2xl font-extrabold">
+            {card?.title || "CHALLENGE NAME"}
+          </div>
         </div>
       </div>
       <div className="flex flex-col pl-5 pt-5 text-start">
@@ -106,11 +90,7 @@ const Create: React.FC = () => {
           daysOfWeek={daysOfWeek}
           setDaysOfWeek={setDaysOfWeek}
         />
-        <DurModal
-          duration={duration}
-          taskId={taskId}
-          setDuration={setDuration}
-        />
+        <DurModal duration={duration} setDuration={setDuration} />
         <StartModal date={date} setDate={setDate} />
       </div>
       <div className="mt-4 flex flex-col pl-5 pt-4 text-start">
