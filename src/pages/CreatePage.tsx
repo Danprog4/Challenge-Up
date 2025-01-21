@@ -23,6 +23,8 @@ const Create: React.FC = () => {
     .flatMap((category) => category.items)
     .find((item) => item.id === Number(id));
 
+  const [isFocus, setIsFocus] = useState(false);
+  const [title, setTitle] = useState(card?.title || "CHALLENGE NAME");
   const [isNotifications, setIsNotifications] = useState(false);
   const [notifications, setNotifications] = useState("Motivate yourself");
   const [color, setColor] = useState(category?.color || "bg-pink-200");
@@ -48,7 +50,7 @@ const Create: React.FC = () => {
   const handleSave = () => {
     const taskData = {
       id: crypto.randomUUID(),
-      title: card?.title || "CHALLENGE NAME",
+      title: title,
       color,
       notifications: isNotifications,
       notificationText: notifications,
@@ -74,9 +76,39 @@ const Create: React.FC = () => {
           </span>
         </div>
         <div className="flex flex-col pl-5 text-start text-black">
-          <span className="mt-4 text-sm">Title</span>
-          <div className="mt-3 text-2xl font-extrabold">
-            {card?.title || "CHALLENGE NAME"}
+          <div className="mr-[5%] mt-4 flex justify-between text-sm">
+            <span>Title</span>
+            {isFocus && title !== "CHALLENGE NAME" && (
+              <span>{title.length}/28</span>
+            )}
+          </div>
+
+          <div
+            className={cn(
+              "mr-[5%] mt-3 text-2xl font-extrabold uppercase",
+              title === "CHALLENGE NAME" && "opacity-[0.3]",
+            )}
+            contentEditable={true}
+            onInput={(event) => {
+              const inputText =
+                (event.target as HTMLElement).textContent?.toUpperCase() || "";
+
+              if (inputText.length > 28) {
+                (event.target as HTMLElement).textContent = String(
+                  inputText.substring(0, 28),
+                );
+              } else {
+                setTitle(inputText);
+              }
+            }}
+            onFocus={() => {
+              setIsFocus(true);
+              if (title === "CHALLENGE NAME") {
+                setTitle("");
+              }
+            }}
+          >
+            {title}
           </div>
         </div>
       </div>
@@ -90,7 +122,7 @@ const Create: React.FC = () => {
           daysOfWeek={daysOfWeek}
           setDaysOfWeek={setDaysOfWeek}
         />
-        <DurModal duration={duration} setDuration={setDuration} />
+        <DurModal duration={duration} setDuration={setDuration} id={id}/>
         <StartModal date={date} setDate={setDate} />
       </div>
       <div className="mt-4 flex flex-col pl-5 pt-4 text-start">

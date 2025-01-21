@@ -42,6 +42,7 @@ const InitiallPage: React.FC = () => {
         <div className="flex flex-col items-center justify-center gap-2">
           {tasks.map((task) => (
             <Link
+              key={task.id}
               to={`/challenge/${task.id}`}
               className={`${task.color} flex h-[14vh] w-[90vw] items-center justify-between rounded-lg p-3`}
             >

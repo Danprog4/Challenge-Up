@@ -16,8 +16,10 @@ const ChallengeInfo: React.FC = () => {
       {!task ? (
         <div>Task is not found</div>
       ) : (
-        <div className={`flex h-full flex-col p-[15px] ${task.color} pb-20`}>
-          <div className="mb-5 flex items-center justify-between text-black">
+        <div
+          className={`flex min-h-screen flex-col p-[15px] ${task.color} pb-20 pt-10`}
+        >
+          <div className="mb-10 flex items-center justify-between text-black">
             <Link to={"/"} className="w-[30px]">
               Back
             </Link>
@@ -46,27 +48,36 @@ const ChallengeInfo: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="mb-10 grid grid-cols-5 gap-0">
-            {days.map((day) => (
-              <div className="flex aspect-square w-full items-center justify-center rounded-full border border-black text-lg font-extrabold text-black">
+          <div className="mb-[75px] grid grid-cols-5 gap-0">
+            {days.map((day, index) => (
+              <div
+                className="flex aspect-square w-full items-center justify-center rounded-full border border-black text-lg font-extrabold text-black"
+                key={index}
+              >
                 <span>{day}</span>
               </div>
             ))}
           </div>
-          <div className="mb-1 border border-black"></div>
-          <div className="flex justify-between text-black">
-            <div className="text-xs font-light">PASSED DAYS</div>
-            <div className="text-3xl font-extrabold">0</div>
+          <div className="mb-5">
+            <div className="mb-1 border border-black"></div>
+            <div className="flex justify-between text-black">
+              <div className="text-xs font-light">PASSED DAYS</div>
+              <div className="text-3xl font-extrabold">0</div>
+            </div>
           </div>
-          <div className="mb-1 border border-black"></div>
-          <div className="flex justify-between text-black">
-            <div className="text-xs font-light">MAXIMUM COMBO</div>
-            <div className="text-3xl font-extrabold">0</div>
+          <div className="mb-5">
+            <div className="mb-1 border border-black"></div>
+            <div className="flex justify-between text-black">
+              <div className="text-xs font-light">PASSED DAYS</div>
+              <div className="text-3xl font-extrabold">0</div>
+            </div>
           </div>
-          <div className="mb-1 border border-black"></div>
-          <div className="flex justify-between text-black">
-            <div className="text-xs font-light">SUCCESSFUL DAYS</div>
-            <div className="text-3xl font-extrabold">0</div>
+          <div className="mb-5">
+            <div className="mb-1 border border-black"></div>
+            <div className="flex justify-between text-black">
+              <div className="text-xs font-light">PASSED DAYS</div>
+              <div className="text-3xl font-extrabold">0</div>
+            </div>
           </div>
           <div className="flex items-center justify-center pl-0 font-extrabold">
             <Link

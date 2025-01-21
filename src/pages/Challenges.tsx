@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import Slider from "../components/Slider";
 import BackImg from "../assets/images/Back.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CrossImg from "../assets/images/Krestiksvgpng.ru_.svg";
 
 const Challenges: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="relative flex flex-col items-start p-[15px]">
       <Link to={"/"}>

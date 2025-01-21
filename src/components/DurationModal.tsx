@@ -1,5 +1,7 @@
 "use client";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { cn } from "@/lib/utils";
+import { useCardsStore } from "@/stores/CardsStore";
 import { useTasksStore } from "@/stores/TasksStore";
 import { title } from "process";
 import React, { useState } from "react";
@@ -8,15 +10,19 @@ import { Drawer } from "vaul";
 interface DurProps {
   duration: number;
   setDuration: (value: number) => void;
+  id?: string | undefined;
 }
 
-export default function VaulDrawer({ duration, setDuration }: DurProps) {
-  //   const { tasks, addTask } = useTasksStore();
+export default function VaulDrawer({ duration, setDuration, id }: DurProps) {
+  const { categories } = useCardsStore();
   const [isCustomDuration, setIsCustomDuration] = useState(false);
   const [inputValue, setInputValue] = useState("Duration");
   const [isFocus, setIsFocus] = useState(false);
   const [isLong, setIsLong] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const card = categories
+    .flatMap((category) => category.items)
+    .find((item) => item.id === Number(id));
 
   const handleClick = () => {
     if (inputValue === "Duration") {
@@ -83,24 +89,51 @@ export default function VaulDrawer({ duration, setDuration }: DurProps) {
                   setIsCustomDuration(value === "Own duration");
                 }}
               >
-                <RadioGroupItem
-                  value="15"
-                  className="max-h-[40px] w-[90vw] rounded-b-none border-b-2 border-gray-600 bg-gray-700 p-[10px]"
-                >
-                  15 days
-                </RadioGroupItem>
-                <RadioGroupItem
-                  value="30"
-                  className="max-h-[40px] w-[90vw] rounded-none border-b-2 border-gray-600 bg-gray-700 p-[10px]"
-                >
-                  30 days
-                </RadioGroupItem>
-                <RadioGroupItem
-                  value="90"
-                  className="max-h-[40px] w-[90vw] rounded-none border-b-2 border-gray-600 bg-gray-700 p-[10px]"
-                >
-                  90 days
-                </RadioGroupItem>
+                {card?.duration?.length ? (
+                  card?.duration?.map((dur, index) => (
+                    <RadioGroupItem
+                      key={index}
+                      value={String(dur)}
+                      className={cn(
+                        "border-b-1 max-h-[40px] w-[90vw] rounded-b-none border border-gray-600 bg-gray-700 p-[10px]",
+                        index + 1 === card.duration?.length &&
+                          "border-b-none rounded-b rounded-t-none",
+                        index !== 0 &&
+                          index + 1 !== card.duration?.length &&
+                          "rounded-none",
+                      )}
+                    >
+                      {dur} days
+                    </RadioGroupItem>
+                  ))
+                ) : (
+                  <>
+                    <RadioGroupItem
+                      value="7"
+                      className="max-h-[40px] w-[90vw] rounded-b-none border-b-2 border-gray-600 bg-gray-700 p-[10px]"
+                    >
+                      7 days
+                    </RadioGroupItem>
+                    <RadioGroupItem
+                      value="15"
+                      className="max-h-[40px] w-[90vw] rounded-none border-b-2 border-gray-600 bg-gray-700 p-[10px]"
+                    >
+                      15 days
+                    </RadioGroupItem>
+                    <RadioGroupItem
+                      value="30"
+                      className="max-h-[40px] w-[90vw] rounded-none border-b-2 border-gray-600 bg-gray-700 p-[10px]"
+                    >
+                      30 days
+                    </RadioGroupItem>
+                    <RadioGroupItem
+                      value="90"
+                      className="max-h-[40px] w-[90vw] rounded-none border-b-2 border-gray-600 bg-gray-700 p-[10px]"
+                    >
+                      90 days
+                    </RadioGroupItem>
+                  </>
+                )}
                 <RadioGroupItem
                   value="Own duration"
                   className="max-h-[40px] w-[90vw] rounded-t-none bg-gray-700 p-[10px]"

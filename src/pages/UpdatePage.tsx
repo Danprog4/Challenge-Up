@@ -22,6 +22,7 @@ const UpdatePage: React.FC = () => {
   }, [taskId, navigate]);
 
   const task = taskId ? getTaskbyId(taskId) : undefined;
+  
   useEffect(() => {
     if (!task) {
       navigate("/");
@@ -88,7 +89,7 @@ const UpdatePage: React.FC = () => {
           daysOfWeek={daysOfWeek}
           setDaysOfWeek={setDaysOfWeek}
         />
-        <DurModal duration={duration} setDuration={setDuration} />
+        <DurModal duration={duration} setDuration={setDuration}/>
         <StartModal date={date} setDate={setDate} />
       </div>
       <div className="mt-4 flex flex-col pl-5 pt-4 text-start">

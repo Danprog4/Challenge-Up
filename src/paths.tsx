@@ -10,6 +10,7 @@ export const Paths = [
   { path: "new", element: NewChallenge },
   { path: "/card/:id", element: Challenge },
   { path: "/card/:id/create", element: Create },
+  { path: "/card/create", element: Create },
   { path: "/challenge/:taskId", element: ChallengeInfo },
   { path: "/update/:taskId", element: UpdatePage },
 ];
