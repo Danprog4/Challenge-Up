@@ -1,5 +1,12 @@
+import { setHours } from "date-fns";
+import { newDate } from "react-datepicker/dist/date_utils";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+
+interface Days {
+  date: string;
+  dayCount: number;
+}
 
 interface Task {
   id: string;
@@ -10,7 +17,9 @@ interface Task {
   duration: number;
   date: Date | undefined;
   regularity: string;
-  daysOfWeek: string[];
+  daysOfWeek: number[];
+  taskDays: Days[];
+  userCheckedDays: string[];
 }
 
 interface TasksStore {
@@ -19,6 +28,11 @@ interface TasksStore {
   updateTask: (id: string, updatedTask: Task) => void;
   getTaskbyId: (id: string) => Task | undefined;
   clearTasks: () => void;
+  checkDay: (
+    taskId: string,
+    day: number,
+    dayBeforeToday: (date: string) => boolean,
+  ) => void;
 }
 
 const useTasksStore = create<TasksStore>()(
@@ -45,6 +59,44 @@ const useTasksStore = create<TasksStore>()(
         return get().tasks.find((task) => task.id === id);
       },
       clearTasks: () => set({ tasks: [] }),
+
+      checkDay: (
+        taskId: string,
+        dayCount: number,
+        dayBeforeToday: (date: string) => boolean,
+      ) => {
+        const task = get().tasks.find((task) => task.id === taskId);
+        if (!task) return;
+
+        const day = task.taskDays.find((day) => day.dayCount === dayCount);
+        if (!day) return;
+
+        const isBeforeToday = dayBeforeToday(day.date);
+
+        if (isBeforeToday && !task.userCheckedDays.includes(day.date)) {
+          const updatedCheckedDays = [...task.userCheckedDays, day.date];
+
+          set((state) => ({
+            tasks: state.tasks.map((task) =>
+              task.id === taskId
+                ? { ...task, userCheckedDays: updatedCheckedDays }
+                : task,
+            ),
+          }));
+        } else if (isBeforeToday && task.userCheckedDays.includes(day.date)) {
+          const updatedCheckedDays = task.userCheckedDays.filter(
+            (checkedDate) => checkedDate !== day.date,
+          );
+
+          set((state) => ({
+            tasks: state.tasks.map((task) =>
+              task.id === taskId
+                ? { ...task, userCheckedDays: updatedCheckedDays }
+                : task,
+            ),
+          }));
+        }
+      },
     }),
     {
       name: "tasks-storage",

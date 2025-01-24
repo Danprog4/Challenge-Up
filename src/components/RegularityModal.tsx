@@ -7,8 +7,8 @@ import { Drawer } from "vaul";
 interface RegProps {
   regularity: string;
   setRegularity: (value: string) => void;
-  daysOfWeek: string[]
-  setDaysOfWeek: (value: string[]) => void;
+  daysOfWeek: number[];
+  setDaysOfWeek: (value: number[]) => void;
 }
 
 export default function VaulDrawer({
@@ -17,7 +17,6 @@ export default function VaulDrawer({
   daysOfWeek,
   setDaysOfWeek,
 }: RegProps) {
-
   const [isOpen, setIsOpen] = useState(false);
 
   const handleChangleRegularity = (option: string) => {
@@ -27,15 +26,13 @@ export default function VaulDrawer({
     setRegularity(option.toString());
   };
 
-  const handleToggle = (day: string) => {
+  const handleToggle = (day: number) => {
     if (daysOfWeek.includes(day)) {
       setDaysOfWeek([...daysOfWeek.filter((item) => day !== item)]);
     } else {
       setDaysOfWeek([...daysOfWeek, day]);
     }
   };
-
-  console.log(daysOfWeek);
 
   return (
     <Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -78,9 +75,9 @@ export default function VaulDrawer({
                     <div
                       className={cn(
                         "text-gray-300",
-                        daysOfWeek.includes("Monday") && "text-yellow-500",
+                        daysOfWeek.includes(1) && "text-yellow-500",
                       )}
-                      onClick={() => handleToggle("Monday")}
+                      onClick={() => handleToggle(1)}
                     >
                       Monday
                     </div>
@@ -89,9 +86,9 @@ export default function VaulDrawer({
                     <div
                       className={cn(
                         "text-gray-300",
-                        daysOfWeek.includes("Tuesday") && "text-yellow-500",
+                        daysOfWeek.includes(2) && "text-yellow-500",
                       )}
-                      onClick={() => handleToggle("Tuesday")}
+                      onClick={() => handleToggle(2)}
                     >
                       Tuesday
                     </div>
@@ -100,9 +97,9 @@ export default function VaulDrawer({
                     <div
                       className={cn(
                         "text-gray-300",
-                        daysOfWeek.includes("Wednesday") && "text-yellow-500",
+                        daysOfWeek.includes(3) && "text-yellow-500",
                       )}
-                      onClick={() => handleToggle("Wednesday")}
+                      onClick={() => handleToggle(3)}
                     >
                       Wednesday
                     </div>
@@ -111,9 +108,9 @@ export default function VaulDrawer({
                     <div
                       className={cn(
                         "text-gray-300",
-                        daysOfWeek.includes("Thursday") && "text-yellow-500",
+                        daysOfWeek.includes(4) && "text-yellow-500",
                       )}
-                      onClick={() => handleToggle("Thursday")}
+                      onClick={() => handleToggle(4)}
                     >
                       Thursday
                     </div>
@@ -122,9 +119,9 @@ export default function VaulDrawer({
                     <div
                       className={cn(
                         "text-gray-300",
-                        daysOfWeek.includes("Friday") && "text-yellow-500",
+                        daysOfWeek.includes(5) && "text-yellow-500",
                       )}
-                      onClick={() => handleToggle("Friday")}
+                      onClick={() => handleToggle(5)}
                     >
                       Friday
                     </div>
@@ -133,9 +130,9 @@ export default function VaulDrawer({
                     <div
                       className={cn(
                         "text-gray-300",
-                        daysOfWeek.includes("Saturday") && "text-yellow-500",
+                        daysOfWeek.includes(6) && "text-yellow-500",
                       )}
-                      onClick={() => handleToggle("Saturday")}
+                      onClick={() => handleToggle(6)}
                     >
                       Saturday
                     </div>
@@ -144,9 +141,9 @@ export default function VaulDrawer({
                     <div
                       className={cn(
                         "text-gray-300",
-                        daysOfWeek.includes("Sunday") && "text-yellow-500",
+                        daysOfWeek.includes(0) && "text-yellow-500",
                       )}
-                      onClick={() => handleToggle("Sunday")}
+                      onClick={() => handleToggle(0)}
                     >
                       Sunday
                     </div>

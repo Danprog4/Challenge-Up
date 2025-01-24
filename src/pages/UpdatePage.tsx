@@ -37,7 +37,7 @@ const UpdatePage: React.FC = () => {
   const [duration, setDuration] = useState(task.duration);
   const [regularity, setRegularity] = useState(task.regularity);
   const [date, setDate] = useState<Date | undefined>(task.date);
-  const [daysOfWeek, setDaysOfWeek] = useState<string[]>(task.daysOfWeek);
+  const [daysOfWeek, setDaysOfWeek] = useState<number[]>(task.daysOfWeek);
 
   const handleChange = (event: React.FormEvent<HTMLDivElement>) => {
     const newNotifications =

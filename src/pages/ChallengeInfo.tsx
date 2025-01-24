@@ -1,15 +1,45 @@
 import { useTasksStore } from "@/stores/TasksStore";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import dayjs from "dayjs";
 
 const ChallengeInfo: React.FC = () => {
-  const { getTaskbyId } = useTasksStore();
+  const { getTaskbyId, checkDay } = useTasksStore();
   const { taskId } = useParams<{ taskId: string }>();
   const task = getTaskbyId(taskId!);
-  const days = Array.from(
-    { length: task?.duration || 30 },
-    (_, index) => index + 1,
-  );
+
+  const formatDate = (date: Date): string => {
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${year}-${month <= 9 ? "0" + month : month}-${day <= 9 ? "0" + day : day}`;
+  };
+
+  const nowDate = new Date();
+  const today = formatDate(nowDate);
+
+  const dayBeforeToday = (date: string): boolean => {
+    const dateToCompare = new Date(date);
+    return dateToCompare < nowDate;
+  };
+
+  const calculateDaysSinceStart = (
+    taskDays: { date: string; dayCount: number }[],
+  ): number => {
+    if (taskDays.length === 0) {
+      return 0;
+    }
+
+    const startDate = new Date(taskDays[0].date);
+    const today = new Date();
+
+    const timeDifference = today.getTime() - startDate.getTime();
+    const daysSinceStart = Math.floor(timeDifference / (1000 * 3600 * 24));
+
+    return daysSinceStart + 1;
+  };
+
+
 
   return (
     <div>
@@ -21,7 +51,7 @@ const ChallengeInfo: React.FC = () => {
         >
           <div className="mb-10 flex items-center justify-between text-black">
             <Link to={"/"} className="w-[30px]">
-              Back
+              ←
             </Link>
             <span>Challenge</span>
             <Link to={`/update/${task.id}`} className="w-[30px]">
@@ -42,41 +72,63 @@ const ChallengeInfo: React.FC = () => {
                 </div>
               </div>
               <div className="relative flex h-[70px] w-[70px] flex-col items-center justify-center rounded-full bg-pink-500">
-                <div className="text-[10px] font-light">
-                  EVERY <br></br> DAY
+                <div className="text-center text-[10px] font-light">
+                  {task.regularity}
                 </div>
               </div>
             </div>
           </div>
           <div className="mb-[75px] grid grid-cols-5 gap-0">
-            {days.map((day, index) => (
-              <div
-                className="flex aspect-square w-full items-center justify-center rounded-full border border-black text-lg font-extrabold text-black"
-                key={index}
-              >
-                <span>{day}</span>
+            {task.taskDays.map((day) => {
+              console.log(task.userCheckedDays, "tasks");
+
+              const hasChecked = !task.userCheckedDays
+                ? false
+                : task.userCheckedDays.includes(day.date);
+
+              const isToday =
+                formatDate(new Date(day.date)) == today && !hasChecked;
+
+              const hasFailed =
+                !isToday && !hasChecked && dayBeforeToday(day.date);
+
+              return (
+                <button
+                  key={day.date}
+                  onClick={() => {
+                    checkDay(task.id, day.dayCount, dayBeforeToday);
+                    console.log(task.userCheckedDays);
+                  }}
+                  className={`aspect-square rounded-full border border-black text-lg font-bold ${isToday && "bg-yellow-500"} ${hasFailed && "bg-red-500"} ${hasChecked && "bg-green-500"}`}
+                >
+                  <span>{day.dayCount}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="mb-5">
+            <div className="mb-1 border border-black"></div>
+            <div className="flex justify-between text-black">
+              <div className="text-xs font-light">PASSED DAYS</div>
+              <div className="text-3xl font-extrabold">
+                {calculateDaysSinceStart(task.taskDays)}
               </div>
-            ))}
+            </div>
           </div>
           <div className="mb-5">
             <div className="mb-1 border border-black"></div>
             <div className="flex justify-between text-black">
-              <div className="text-xs font-light">PASSED DAYS</div>
+              <div className="text-xs font-light">MAXIMUM COMBO</div>
               <div className="text-3xl font-extrabold">0</div>
             </div>
           </div>
           <div className="mb-5">
             <div className="mb-1 border border-black"></div>
             <div className="flex justify-between text-black">
-              <div className="text-xs font-light">PASSED DAYS</div>
-              <div className="text-3xl font-extrabold">0</div>
-            </div>
-          </div>
-          <div className="mb-5">
-            <div className="mb-1 border border-black"></div>
-            <div className="flex justify-between text-black">
-              <div className="text-xs font-light">PASSED DAYS</div>
-              <div className="text-3xl font-extrabold">0</div>
+              <div className="text-xs font-light">SUCCESSFUL DAYS</div>
+              <div className="text-3xl font-extrabold">
+                {task.userCheckedDays.length}
+              </div>
             </div>
           </div>
           <div className="flex items-center justify-center pl-0 font-extrabold">

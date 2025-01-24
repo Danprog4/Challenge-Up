@@ -1,5 +1,5 @@
-import React, { useEffect, useId, useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useCardsStore } from "../stores/CardsStore";
 import { useTasksStore } from "@/stores/TasksStore";
 import CrossImg from "../assets/images/Krestiksvgpng.ru_.svg";
@@ -9,8 +9,16 @@ import StartModal from "@/components/StartModal";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { Colors } from "@/bgColors";
+import dayjs from "dayjs";
+import { Link } from "react-router-dom";
 
 const Create: React.FC = () => {
+  interface Days {
+    date: string;
+    dayCount: number;
+    userCheckedDays: string[];
+  }
+
   const navigate = useNavigate();
   const { addTask } = useTasksStore();
   const { id } = useParams<{ id: string }>();
@@ -29,9 +37,9 @@ const Create: React.FC = () => {
   const [notifications, setNotifications] = useState("Motivate yourself");
   const [color, setColor] = useState(category?.color || "bg-pink-200");
   const [duration, setDuration] = useState(30);
-  const [regularity, setRegularity] = useState("Every day");
+  const [regularity, setRegularity] = useState("Everyday");
   const [date, setDate] = useState<Date | undefined>(undefined);
-  const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
+  const [daysOfWeek, setDaysOfWeek] = useState<number[]>([]);
 
   const handleClick = () => {
     if (notifications === "Motivate yourself") {
@@ -47,10 +55,54 @@ const Create: React.FC = () => {
 
   const getNavigationPath = () => (card ? `/card/${card.id}` : "/");
 
+  const formatDate = (date: Date): string => {
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${year}-${month <= 9 ? "0" + month : month}-${day <= 9 ? "0" + day : day}`;
+  };
+
+  const getDatesForDaysOfWeek = (
+    startDate: Date,
+    duration: number,
+    selectedDays: number[],
+  ) => {
+    const taskDays: Days[] = [];
+    let currentDate = dayjs(startDate);
+    let dayCount = 1;
+
+    for (let i = 0; i < duration; i++) {
+      if (selectedDays.includes(currentDate.day())) {
+        taskDays.push({
+          date: currentDate.format("YYYY-MM-DD"),
+          dayCount,
+          userCheckedDays: [],
+        });
+        dayCount++;
+      }
+      currentDate = currentDate.add(1, "day");
+    }
+    return taskDays;
+  };
+
   const handleSave = () => {
+    if (!title || title === "CHALLENGE NAME") {
+      alert("Write a title of your task");
+      return;
+    }
+
+    const startDate = new Date(date ? date : Date.now());
+
+    if (formatDate(startDate) < formatDate(new Date(Date.now()))) {
+      alert("Write a possible start time");
+      return;
+    }
+
+    const taskDays = getDatesForDaysOfWeek(startDate, duration, daysOfWeek);
+
     const taskData = {
       id: crypto.randomUUID(),
-      title: title,
+      title,
       color,
       notifications: isNotifications,
       notificationText: notifications,
@@ -58,6 +110,8 @@ const Create: React.FC = () => {
       regularity,
       date,
       daysOfWeek,
+      taskDays: taskDays,
+      userCheckedDays: [],
     };
 
     addTask(taskData);
@@ -122,7 +176,7 @@ const Create: React.FC = () => {
           daysOfWeek={daysOfWeek}
           setDaysOfWeek={setDaysOfWeek}
         />
-        <DurModal duration={duration} setDuration={setDuration} id={id}/>
+        <DurModal duration={duration} setDuration={setDuration} id={id} />
         <StartModal date={date} setDate={setDate} />
       </div>
       <div className="mt-4 flex flex-col pl-5 pt-4 text-start">
