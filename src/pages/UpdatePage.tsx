@@ -22,7 +22,7 @@ const UpdatePage: React.FC = () => {
   }, [taskId, navigate]);
 
   const task = taskId ? getTaskbyId(taskId) : undefined;
-  
+
   useEffect(() => {
     if (!task) {
       navigate("/");
@@ -35,6 +35,7 @@ const UpdatePage: React.FC = () => {
   const [notifications, setNotifications] = useState(task.notificationText);
   const [color, setColor] = useState(task.color);
   const [duration, setDuration] = useState(task.duration);
+  const [title, setTitle] = useState(task?.title || "CHALLENGE NAME");
   const [regularity, setRegularity] = useState(task.regularity);
   const [date, setDate] = useState<Date | undefined>(task.date);
   const [daysOfWeek, setDaysOfWeek] = useState<number[]>(task.daysOfWeek);
@@ -76,7 +77,24 @@ const UpdatePage: React.FC = () => {
         </div>
         <div className="flex flex-col pl-5 text-start text-black">
           <span className="mt-4 text-sm">Title</span>
-          <span className="mt-3 text-2xl font-extrabold">{task.title}</span>
+          <div
+            className={cn("mr-[5%] mt-3 text-2xl font-extrabold uppercase")}
+            contentEditable={true}
+            onInput={(event) => {
+              const inputText =
+                (event.target as HTMLElement).textContent?.toUpperCase() || "";
+
+              if (inputText.length > 28) {
+                (event.target as HTMLElement).textContent = String(
+                  inputText.substring(0, 28),
+                );
+              } else {
+                setTitle(inputText);
+              }
+            }}
+          >
+            {task?.title}
+          </div>
         </div>
       </div>
       <div className="flex flex-col pl-5 pt-5 text-start">
@@ -89,7 +107,11 @@ const UpdatePage: React.FC = () => {
           daysOfWeek={daysOfWeek}
           setDaysOfWeek={setDaysOfWeek}
         />
-        <DurModal duration={duration} setDuration={setDuration}/>
+        <DurModal
+          duration={Number(duration)}
+          setDuration={setDuration}
+          regularity={regularity}
+        />
         <StartModal date={date} setDate={setDate} />
       </div>
       <div className="mt-4 flex flex-col pl-5 pt-4 text-start">

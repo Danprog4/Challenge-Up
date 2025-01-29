@@ -4,6 +4,8 @@ import NewChallenge from "./pages/Challenges";
 import Create from "./pages/CreatePage";
 import ChallengeInfo from "./pages/ChallengeInfo";
 import UpdatePage from "./pages/UpdatePage";
+import AboutPage from "./pages/AboutPage";
+import HintsAndTipsPage from "./pages/HintsAndTipsPage";
 
 export const Paths = [
   { path: "/", element: InitiallPage },
@@ -13,4 +15,6 @@ export const Paths = [
   { path: "/card/create", element: Create },
   { path: "/challenge/:taskId", element: ChallengeInfo },
   { path: "/update/:taskId", element: UpdatePage },
+  { path: "/about", element: AboutPage },
+  { path: "/hints", element: HintsAndTipsPage },
 ];

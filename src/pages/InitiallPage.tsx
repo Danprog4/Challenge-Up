@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import AboutImage from "../assets/images/About.png";
-import AddImage from "../assets/images/Add.png";
+import PlusImg from "../assets/images/plus-svgrepo-com.svg";
 import { useTasksStore } from "@/stores/TasksStore";
 import CheckImg from "../assets/images/icons8-галочка.svg";
+import { NumericInput } from "@/components/input";
+import AboutImg from "../assets/images/menu-symbol-of-three-parallel-lines-svgrepo-com (1).svg";
 
 const InitiallPage: React.FC = () => {
   const { tasks, checkDay } = useTasksStore();
+  const [amount, setAmount] = useState("");
 
   const calculateDaysSinceStart = (
     taskDays: { date: string; dayCount: number }[],
@@ -44,44 +46,53 @@ const InitiallPage: React.FC = () => {
 
   return (
     <div className="flex h-screen flex-col">
-      <div className="flex justify-between">
-        <Link to={"/"}>
-          <img src={AboutImage} className="h-[50px] w-[60px]" alt="About" />
+      <div className="fixed z-10 flex w-full justify-between bg-black pb-2 pl-5 pr-5 pt-10">
+        <Link to={"/about"} className="">
+          <img
+            src={AboutImg}
+            className="h-[20px] w-[20px] object-contain"
+            alt="About"
+          />
         </Link>
-        <Link to={"new"}>
-          <img src={AddImage} className="h-[50px] w-[60px]" alt="Add" />
+        <Link to={"new"} className="-translate-y-2 translate-x-2">
+          <img
+            src={PlusImg}
+            className="h-[35px] w-[35px] object-contain"
+            alt="Add"
+          />
         </Link>
-      </div>
+      </div>{" "}
       {tasks.length === 0 ? (
-        <div className="justify- mt-10 flex h-screen flex-col items-center justify-center">
+        <div className="mt-10 flex h-screen flex-col items-center justify-center">
           <Link to={"new"}>
             <div className="absolute left-1/2 top-1/2 flex aspect-square w-[100vw] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-yellow-400">
               <div className="relative text-center">
                 <div className="mb-2 text-4xl font-extrabold text-black">+</div>
                 <div className="mb-11 text-3xl font-extrabold text-black">
-                  CREATE NEW <br />
-                  CHALLENGE
+                  СОЗДАТЬ НОВОЕ <br />
+                  ЗАДАНИЕ
                 </div>
               </div>
             </div>
           </Link>
           <div className="absolute bottom-4 text-nowrap p-2 text-center text-sm text-gray-400">
             <div>
-              You don't have any challenges yet. Choose a new <br />
-              challenge from a list of available challenges or create a <br />
-              completely new one!
+              У тебя пока нету никаких заданий. Выбери новый <br />
+              из списка доступных или создай свой
+              <br />
+              совершенно новый!
             </div>
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center gap-2">
-          {tasks.map((task) => {
+        <div className="mt-24 flex flex-col items-center justify-center gap-2">
+          {tasks.map((task, index) => {
             const daysSinceStart = calculateDaysSinceStart(task.taskDays);
             return (
               <Link
                 key={task.id}
                 to={`/challenge/${task.id}`}
-                className={`${task.color} flex h-[14vh] w-[90vw] items-center justify-between rounded-lg p-3`}
+                className={`${task.color} flex h-[14vh] w-[90vw] items-center justify-between rounded-lg p-3 ${index + 1 === tasks.length && "mb-10"}`}
               >
                 <div className="flex flex-col">
                   <span className="text-lg font-extrabold text-black">

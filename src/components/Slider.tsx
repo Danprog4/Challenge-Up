@@ -8,9 +8,9 @@ const Slider: React.FC = () => {
   return (
     <div className="flex flex-col">
       {categories.map((category, index) => (
-        <div key={index} className="mb-5">
-          <div className="flex justify-between">
-            <div className="mb-3">{category.title}</div>
+        <div key={index} className="mb-8 pl-5">
+          <div className="flex justify-between pr-5">
+            <div className="mb-4">{category.title}</div>
             <div className="text-gray-400">1/{category.items.length}</div>
           </div>
           <div className="flex snap-x snap-mandatory space-x-4 overflow-auto scroll-smooth">

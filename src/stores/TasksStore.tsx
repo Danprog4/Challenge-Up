@@ -3,12 +3,12 @@ import { newDate } from "react-datepicker/dist/date_utils";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-interface Days {
+export interface Days {
   date: string;
   dayCount: number;
 }
 
-interface Task {
+export interface Task {
   id: string;
   title: string;
   color: string;

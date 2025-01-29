@@ -5,7 +5,3 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-
-export const changeTaskStartDate = (id: string, newDate: Date) => {
-  
-}

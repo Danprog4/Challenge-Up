@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCardsStore } from "../stores/CardsStore";
 import { useTasksStore } from "@/stores/TasksStore";
@@ -11,14 +11,11 @@ import { cn } from "@/lib/utils";
 import { Colors } from "@/bgColors";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
+import { Days } from "@/stores/TasksStore";
+import { toast } from "sonner";
+import { NumericInput } from "@/components/input";
 
 const Create: React.FC = () => {
-  interface Days {
-    date: string;
-    dayCount: number;
-    userCheckedDays: string[];
-  }
-
   const navigate = useNavigate();
   const { addTask } = useTasksStore();
   const { id } = useParams<{ id: string }>();
@@ -31,26 +28,29 @@ const Create: React.FC = () => {
     .flatMap((category) => category.items)
     .find((item) => item.id === Number(id));
 
-  const [isFocus, setIsFocus] = useState(false);
-  const [title, setTitle] = useState(card?.title || "CHALLENGE NAME");
+  const [title, setTitle] = useState(card?.title || "");
   const [isNotifications, setIsNotifications] = useState(false);
-  const [notifications, setNotifications] = useState("Motivate yourself");
+  const [notifications, setNotifications] = useState("");
   const [color, setColor] = useState(category?.color || "bg-pink-200");
   const [duration, setDuration] = useState(30);
   const [regularity, setRegularity] = useState("Everyday");
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [daysOfWeek, setDaysOfWeek] = useState<number[]>([]);
 
+  useEffect(() => {
+    if (regularity === "Everyday") {
+      setDuration(30);
+    } else if (regularity === "Few times a week") {
+      setDuration(84);
+    } else {
+      setDuration(30);
+    }
+  }, [regularity]);
+
   const handleClick = () => {
     if (notifications === "Motivate yourself") {
       setNotifications("");
     }
-  };
-
-  const handleChange = (event: React.FormEvent<HTMLDivElement>) => {
-    const newNotifications =
-      (event.target as HTMLDivElement).textContent || "Motivate yourself";
-    setNotifications(newNotifications);
   };
 
   const getNavigationPath = () => (card ? `/card/${card.id}` : "/");
@@ -71,30 +71,42 @@ const Create: React.FC = () => {
     let currentDate = dayjs(startDate);
     let dayCount = 1;
 
-    for (let i = 0; i < duration; i++) {
-      if (selectedDays.includes(currentDate.day())) {
+    if (regularity !== "Everyday") {
+      for (let i = 0; i < duration; i++) {
+        if (selectedDays.includes(currentDate.day())) {
+          taskDays.push({
+            date: currentDate.format("YYYY-MM-DD"),
+            dayCount,
+          });
+          dayCount++;
+        }
+        currentDate = currentDate.add(1, "day");
+      }
+    } else {
+      for (let i = 0; i < duration; i++) {
         taskDays.push({
           date: currentDate.format("YYYY-MM-DD"),
           dayCount,
-          userCheckedDays: [],
         });
         dayCount++;
+
+        currentDate = currentDate.add(1, "day");
       }
-      currentDate = currentDate.add(1, "day");
     }
+
     return taskDays;
   };
 
   const handleSave = () => {
-    if (!title || title === "CHALLENGE NAME") {
-      alert("Write a title of your task");
+    if (!title || title === "НАЗВАНИЕ ЗАДАНИЯ") {
+      toast("Write a title of your task");
       return;
     }
 
     const startDate = new Date(date ? date : Date.now());
 
     if (formatDate(startDate) < formatDate(new Date(Date.now()))) {
-      alert("Write a possible start time");
+      toast("Write a possible start time");
       return;
     }
 
@@ -126,48 +138,39 @@ const Create: React.FC = () => {
             <img src={CrossImg} alt="cross" className="m-2 h-10 w-10" />
           </Link>
           <span className="mt-[15.5px] w-full text-center text-black">
-            New challenge
+            Новое задание
           </span>
         </div>
         <div className="flex flex-col pl-5 text-start text-black">
           <div className="mr-[5%] mt-4 flex justify-between text-sm">
-            <span>Title</span>
-            {isFocus && title !== "CHALLENGE NAME" && (
-              <span>{title.length}/28</span>
-            )}
+            <span>Название</span>
+            {title !== "" && <span>{title.length}/28</span>}
           </div>
-
           <div
             className={cn(
               "mr-[5%] mt-3 text-2xl font-extrabold uppercase",
-              title === "CHALLENGE NAME" && "opacity-[0.3]",
+              title === "НАЗВАНИЕ ЗАДАНИЯ" && "opacity-[0.3]",
             )}
-            contentEditable={true}
-            onInput={(event) => {
-              const inputText =
-                (event.target as HTMLElement).textContent?.toUpperCase() || "";
-
-              if (inputText.length > 28) {
-                (event.target as HTMLElement).textContent = String(
-                  inputText.substring(0, 28),
-                );
-              } else {
-                setTitle(inputText);
-              }
-            }}
-            onFocus={() => {
-              setIsFocus(true);
-              if (title === "CHALLENGE NAME") {
-                setTitle("");
-              }
-            }}
           >
-            {title}
+            <input
+              type="text"
+              className="border-none bg-transparent text-black placeholder:text-gray-500 focus:outline-none"
+              value={title}
+              onChange={(e) => {
+                const inputValue = e.target.value.toUpperCase();
+                const filteredValue = inputValue.replace(
+                  /[^a-zA-Zа-яА-Я\s]/g,
+                  "",
+                );
+                setTitle(filteredValue);
+              }}
+              placeholder="НАЗВАНИЕ ЗАДАНИЯ"
+            />
           </div>
         </div>
       </div>
       <div className="flex flex-col pl-5 pt-5 text-start">
-        <span className="mb-2 mt-2 text-gray-300">Terms</span>
+        <span className="mb-2 mt-2 text-gray-300">Условия</span>
       </div>
       <div className="flex flex-col items-center justify-center">
         <Modal
@@ -176,33 +179,44 @@ const Create: React.FC = () => {
           daysOfWeek={daysOfWeek}
           setDaysOfWeek={setDaysOfWeek}
         />
-        <DurModal duration={duration} setDuration={setDuration} id={id} />
+        <DurModal
+          duration={duration}
+          setDuration={setDuration}
+          id={id}
+          regularity={regularity}
+        />
         <StartModal date={date} setDate={setDate} />
       </div>
       <div className="mt-4 flex flex-col pl-5 pt-4 text-start">
-        <span className="mb-2 text-gray-300">Notifications</span>
+        <span className="mb-2 text-gray-300">Уведомления</span>
       </div>
       <div className="flex flex-col items-center justify-center gap-2">
         <div className="flex h-[44px] w-[90vw] items-center justify-between rounded-md bg-gray-700 p-[10px]">
-          <span>Enable notifications</span>
+          <span>Включить уведомления</span>
           <Switch onClick={() => setIsNotifications(!isNotifications)} />
         </div>
         {isNotifications && (
           <div className="flex h-[60px] w-[90vw] flex-col justify-center rounded-md bg-gray-700 p-[10px]">
-            <span>Notification text</span>
-            <div
-              className="text-gray-500"
-              contentEditable="true"
+            <span>Текст для уведомления</span>
+            <input
+              value={notifications}
+              className="border-none bg-transparent text-gray-300 placeholder:text-gray-500 focus:outline-none"
+              placeholder="Мотивируй себя"
               onClick={handleClick}
-              onInput={handleChange}
-            >
-              {notifications}
-            </div>
+              onChange={(e) => {
+                const inputValue = e.target.value;
+                const filteredValue = inputValue.replace(
+                  /[^a-zA-Zа-яА-Я\s]/g,
+                  "",
+                );
+                setNotifications(filteredValue);
+              }}
+            />
           </div>
         )}
       </div>
       <div className="mt-4 flex flex-col pl-5 pt-4 text-start">
-        <span className="mb-2 text-gray-300">Color scheme</span>
+        <span className="mb-2 text-gray-300">Цвет</span>
       </div>
       <div className="mb-20 grid grid-cols-5 gap-0">
         {Colors.map((classColor: string) => (
@@ -221,7 +235,7 @@ const Create: React.FC = () => {
           onClick={handleSave}
           className="fixed bottom-[10px] flex h-[45px] w-[95vw] items-center justify-center rounded-lg bg-pink-600 p-5"
         >
-          SAVE
+          СОХРАНИТЬ
         </button>
       </div>
     </div>

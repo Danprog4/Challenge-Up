@@ -3,7 +3,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import React, { useState } from "react";
 import { Drawer } from "vaul";
 import { Calendar } from "@/components/ui/calendar";
-import { newDate } from "react-datepicker/dist/date_utils";
+import dayjs from "dayjs";
 
 interface dateProps {
   date: Date | undefined;
@@ -11,23 +11,27 @@ interface dateProps {
 }
 
 export default function VaulDrawer({ date, setDate }: dateProps) {
-  const [startDate, setStartDate] = useState("Now");
+  const [tempDate, setTempDate] = useState<Date | undefined>(date); // Локальная дата
+  const [startDate, setStartDate] = useState("Now"); // Глобальная дата
+  const [tempStartTime, setTempStartTime] = useState(startDate); // Локальное время
   const [isOpen, setIsOpen] = useState(false);
 
   const Months: Record<number, string> = {
-    1: "Jan",
-    2: "Feb",
-    3: "Mar",
-    4: "Apr",
-    5: "May",
-    6: "Jun",
-    7: "Jul",
-    8: "Aug",
-    9: "Sep",
-    10: "Oct",
-    11: "Nov",
-    12: "Dec",
+    1: "Янв",
+    2: "Фев",
+    3: "Мар",
+    4: "Апр",
+    5: "Май",
+    6: "Июн",
+    7: "Июл",
+    8: "Авг",
+    9: "Сен",
+    10: "Окт",
+    11: "Ноя",
+    12: "Дек",
   };
+
+  const today = dayjs();
 
   // Проверка, является ли дата валидной
   const isValidDate = (date: any): date is Date => {
@@ -47,15 +51,31 @@ export default function VaulDrawer({ date, setDate }: dateProps) {
   // Для форматирования месяца
   const monthNumber = isValidDate(date) ? date.getMonth() + 1 : 1;
 
-  console.log(date);
+  // Синхронизация startDate с tempStartDate только по кнопке "ГОТОВО"
+  const handleSave = () => {
+    setDate(tempDate); // Обновляем глобальное состояние только по кнопке "ГОТОВО"
+    setStartDate(tempStartTime); // Обновляем глобальное состояние времени старта
+    setIsOpen(false); // Закрываем Drawer
+  };
+
+  console.log(tempStartTime);
+  console.log(startDate);
+
   return (
-    <Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
+    <Drawer.Root
+      open={isOpen}
+      onOpenChange={setIsOpen}
+      onClose={() => {
+        setTempDate(date); // Сброс временной даты при закрытии
+        setTempStartTime(startDate); // Сброс временного времени при закрытии
+      }}
+    >
       <Drawer.Trigger className="mt-2 flex w-[90vw] justify-between rounded-md bg-gray-700 p-[10px]">
-        <span>Start</span>
+        <span>Старт</span>
         <span className="text-gray-400">
           {`${
             !isValidDate(date)
-              ? "Now >"
+              ? "Сейчас >"
               : `${date?.getDate() <= 9 ? "0" + date.getDate() : date.getDate()}.${monthNumber <= 9 ? "0" + monthNumber : monthNumber}.${date?.getFullYear()} >`
           }  `}
         </span>
@@ -69,15 +89,17 @@ export default function VaulDrawer({ date, setDate }: dateProps) {
             </div>
             <div className="flex flex-col items-center justify-center text-gray-300">
               <RadioGroup
-                defaultValue={startDate}
+                value={tempStartTime} // Задаем значение выбранной опции
                 onValueChange={(value) => {
-                  setStartDate(value);
+                  setTempStartTime(value);
                   if (value === "Now") {
-                    setDate(new Date()); // Устанавливаем текущую дату
+                    setTempDate(new Date()); // Устанавливаем текущую дату
                   } else if (value === "Tomorrow") {
                     const tomorrow = new Date();
                     tomorrow.setDate(tomorrow.getDate() + 1); // Завтрашняя дата
-                    setDate(tomorrow);
+                    setTempDate(tomorrow);
+                  } else if (value === "Own date") {
+                    setTempDate(new Date()); // Устанавливаем текущую дату, если выбрано "Своя дата"
                   }
                 }}
               >
@@ -85,32 +107,34 @@ export default function VaulDrawer({ date, setDate }: dateProps) {
                   value="Now"
                   className="max-h-[40px] w-[90vw] rounded-b-none border-b-2 border-gray-600 bg-gray-700 p-[10px]"
                 >
-                  Now
+                  Сейчас
                 </RadioGroupItem>
                 <RadioGroupItem
-                  value="Tomorrow" // Исправил опечатку
+                  value="Tomorrow"
                   className="max-h-[40px] w-[90vw] rounded-none border-b-2 border-gray-600 bg-gray-700 p-[10px]"
                 >
-                  Tomorrow
+                  Завтра
                 </RadioGroupItem>
                 <RadioGroupItem
                   value="Own date"
                   className="flex max-h-[40px] w-[90vw] justify-between rounded-t-none bg-gray-700 p-[10px]"
                 >
-                  <span>Own date</span>
-                  {isValidDate(date) && (
-                    <span>{`${date?.getDate()} ${Months[monthNumber]}`}</span>
-                  )}
+                  <span>Своя дата</span>
+                  {isValidDate(tempDate) &&
+                    !dayjs(tempDate).isSame(today, "day") &&
+                    !dayjs(tempDate).isSame(today.add(1, "day"), "day") && (
+                      <span>{`${tempDate?.getDate() <= 9 ? "0" + tempDate?.getDate() : tempDate?.getDate()} ${Months[monthNumber]}`}</span>
+                    )}
                 </RadioGroupItem>
               </RadioGroup>
 
               {/* Календарь появляется только если выбрано "Own date" */}
-              {startDate === "Own date" && (
+              {tempStartTime === "Own date" && (
                 <div>
                   <Calendar
                     mode="single"
-                    selected={date}
-                    onSelect={setDate}
+                    selected={tempDate}
+                    onSelect={setTempDate}
                     disabled={isDisabled}
                     className="mt-2 flex w-[90vw] items-center justify-center rounded-md border bg-gray-700"
                   />
@@ -120,10 +144,10 @@ export default function VaulDrawer({ date, setDate }: dateProps) {
 
             <div
               className="flex items-center justify-center pl-0 font-extrabold"
-              onClick={() => setIsOpen(!isOpen)} // Закрыть Drawer
+              onClick={handleSave} // Сохраняем данные по кнопке "ГОТОВО"
             >
               <div className="fixed bottom-[10px] flex h-[45px] w-[95vw] items-center justify-center rounded-lg bg-yellow-300 p-5">
-                <span>DONE</span>
+                <span>ГОТОВО</span>
               </div>
             </div>
           </div>

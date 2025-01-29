@@ -29,7 +29,7 @@ const Challenge: React.FC = () => {
           />
         </Link>
         <div className="absolute inset-0 flex flex-col pl-[14px] pt-10 text-start">
-          <span className="text-sm text-white">Challenge</span>
+          <span className="text-sm text-white">Задание</span>
           <span className="text-2xl font-bold text-black">{card?.title}</span>
         </div>
         <div className="absolute bottom-0 left-0 flex pb-4 pl-[14px]">
@@ -38,7 +38,7 @@ const Challenge: React.FC = () => {
               <div className="text-center">
                 <div className="text-[20px] font-extrabold">{dur}</div>
                 <div className="mb-1 mt-[-5px] text-[10px] font-light">
-                  DAYS
+                  ДНЕЙ
                 </div>
               </div>
             </div>
@@ -47,7 +47,7 @@ const Challenge: React.FC = () => {
         <div className="absolute bottom-0 right-0 p-2">
           <div className="m-2 flex h-[70px] w-[70px] flex-col items-center justify-center rounded-full bg-black bg-cover">
             <div className="text-start text-[10px] font-light">
-              EVERY <br></br> DAY
+              КАЖДЫЙ <br></br> ДЕНЬ
             </div>
           </div>
         </div>
@@ -59,7 +59,7 @@ const Challenge: React.FC = () => {
           tempore veniam sit?
         </p>
         <div className="text-start">
-          <span className="text-2xl font-bold">HINTS AND TIPS</span>
+          <span className="text-2xl font-bold">СОВЕТЫ И ПОДСКАЗКИ</span>
           <div className="mt-3 flex gap-2 text-lg font-light text-gray-300">
             <span className="inline-block font-bold text-white">-</span>
             <p>
@@ -95,7 +95,7 @@ const Challenge: React.FC = () => {
           to={`/card/${card?.id}/create`}
           className="fixed bottom-[10px] flex h-[45px] w-[95vw] items-center justify-center rounded-lg bg-pink-600 p-5"
         >
-          <div className="">CONTINUE</div>
+          <div className="">ПРОДОЛЖИТЬ</div>
         </Link>
       </div>
     </div>
