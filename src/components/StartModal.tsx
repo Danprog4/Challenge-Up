@@ -1,35 +1,41 @@
 "use client";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { Drawer } from "vaul";
 import { Calendar } from "@/components/ui/calendar";
 import dayjs from "dayjs";
+import { Months } from "@/monthes";
 
 interface dateProps {
-  date: Date | undefined;
-  setDate: (value: Date | undefined) => void;
+  date?: Date | undefined;
+  setDate?: (value: Date | undefined) => void;
+  disabled: boolean;
+  startedDate?: string;
 }
 
-export default function VaulDrawer({ date, setDate }: dateProps) {
-  const [tempDate, setTempDate] = useState<Date | undefined>(date); // Локальная дата
+export default function VaulDrawer({
+  date,
+  setDate,
+  disabled,
+  startedDate,
+}: dateProps) {
+  const [tempDate, setTempDate] = useState<Date | undefined>(new Date()); // Локальная дата
   const [startDate, setStartDate] = useState("Now"); // Глобальная дата
   const [tempStartTime, setTempStartTime] = useState(startDate); // Локальное время
   const [isOpen, setIsOpen] = useState(false);
 
-  const Months: Record<number, string> = {
-    1: "Янв",
-    2: "Фев",
-    3: "Мар",
-    4: "Апр",
-    5: "Май",
-    6: "Июн",
-    7: "Июл",
-    8: "Авг",
-    9: "Сен",
-    10: "Окт",
-    11: "Ноя",
-    12: "Дек",
-  };
+  useEffect(() => {
+    const today = new Date();
+    if (tempStartTime === "Now") {
+      setTempDate(today);
+    } else if (tempStartTime === "Tomorrow") {
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      setTempDate(tomorrow);
+    } else if (tempStartTime === "Own date") {
+      setTempDate(today);
+    }
+  }, [tempStartTime]);
 
   const today = dayjs();
 
@@ -49,17 +55,20 @@ export default function VaulDrawer({ date, setDate }: dateProps) {
   };
 
   // Для форматирования месяца
-  const monthNumber = isValidDate(date) ? date.getMonth() + 1 : 1;
+  const monthNumber = isValidDate(tempDate) ? tempDate.getMonth() + 1 : 1;
 
   // Синхронизация startDate с tempStartDate только по кнопке "ГОТОВО"
   const handleSave = () => {
-    setDate(tempDate); // Обновляем глобальное состояние только по кнопке "ГОТОВО"
+    if (setDate) {
+      setDate(tempDate); // Обновляем глобальное состояние только по кнопке "ГОТОВО"
+    }
     setStartDate(tempStartTime); // Обновляем глобальное состояние времени старта
     setIsOpen(false); // Закрываем Drawer
   };
 
-  console.log(tempStartTime);
-  console.log(startDate);
+  console.log(tempDate, "tempdate");
+  console.log(tempStartTime, "tempStart");
+  console.log(date, "date2");
 
   return (
     <Drawer.Root
@@ -70,14 +79,20 @@ export default function VaulDrawer({ date, setDate }: dateProps) {
         setTempStartTime(startDate); // Сброс временного времени при закрытии
       }}
     >
-      <Drawer.Trigger className="mt-2 flex w-[90vw] justify-between rounded-md bg-gray-700 p-[10px]">
+      <Drawer.Trigger
+        className={`mt-2 flex w-[90vw] justify-between rounded-md bg-gray-700 p-[10px] ${disabled && "bg-gray-800"}`}
+        disabled={disabled}
+      >
         <span>Старт</span>
         <span className="text-gray-400">
-          {`${
-            !isValidDate(date)
+          {startedDate
+            ? startedDate
+            : tempStartTime === "Now"
               ? "Сейчас >"
-              : `${date?.getDate() <= 9 ? "0" + date.getDate() : date.getDate()}.${monthNumber <= 9 ? "0" + monthNumber : monthNumber}.${date?.getFullYear()} >`
-          }  `}
+              : tempStartTime === "Tomorrow"
+                ? "Завтра >"
+                : isValidDate(date) &&
+                  `${date?.getDate() <= 9 ? "0" + date.getDate() : date.getDate()}.${monthNumber <= 9 ? "0" + monthNumber : monthNumber}.${date?.getFullYear()} >`}
         </span>
       </Drawer.Trigger>
       <Drawer.Portal>
@@ -92,15 +107,6 @@ export default function VaulDrawer({ date, setDate }: dateProps) {
                 value={tempStartTime} // Задаем значение выбранной опции
                 onValueChange={(value) => {
                   setTempStartTime(value);
-                  if (value === "Now") {
-                    setTempDate(new Date()); // Устанавливаем текущую дату
-                  } else if (value === "Tomorrow") {
-                    const tomorrow = new Date();
-                    tomorrow.setDate(tomorrow.getDate() + 1); // Завтрашняя дата
-                    setTempDate(tomorrow);
-                  } else if (value === "Own date") {
-                    setTempDate(new Date()); // Устанавливаем текущую дату, если выбрано "Своя дата"
-                  }
                 }}
               >
                 <RadioGroupItem

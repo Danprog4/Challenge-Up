@@ -1,76 +1,26 @@
 import { useTasksStore } from "@/stores/TasksStore";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link, useParams } from "react-router-dom";
-import dayjs from "dayjs";
 import { toast } from "sonner";
+import { calculateDaysSinceStart } from "@/lib/dateUtils";
+import { formatDate } from "@/lib/dateUtils";
+import { dayBeforeToday } from "@/lib/dateUtils";
+import { calculateWeeks } from "@/lib/dateUtils";
+import { calculateNextDay } from "@/lib/dateUtils";
 
 const ChallengeInfo: React.FC = () => {
   const { getTaskbyId, checkDay } = useTasksStore();
   const { taskId } = useParams<{ taskId: string }>();
   const task = getTaskbyId(taskId!);
-
-  if (!task) {
-    toast("This task cannot be found");
-    return;
-  }
-
-  const formatDate = (date: Date): string => {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return `${year}-${month <= 9 ? "0" + month : month}-${day <= 9 ? "0" + day : day}`;
-  };
-
   const nowDate = new Date();
   const today = formatDate(nowDate);
 
-  const dayBeforeToday = (date: string): boolean => {
-    const dateToCompare = new Date(date);
-    return dateToCompare < nowDate;
-  };
+  if (!task) {
+    toast("Задача не найдена");
+    return;
+  }
 
-  const calculateDaysSinceStart = (
-    taskDays: { date: string; dayCount: number }[],
-  ): number => {
-    if (taskDays.length === 0) {
-      return 0;
-    }
-
-    const startDate = new Date(taskDays[0].date);
-    const today = new Date();
-
-    const timeDifference = today.getTime() - startDate.getTime();
-    const daysSinceStart = Math.floor(timeDifference / (1000 * 3600 * 24));
-
-    return daysSinceStart + 1;
-  };
-
-  const calculateWeeks = (): {
-    week: number;
-    days: { date: string; dayCount: number }[];
-  }[] => {
-    const weeks = [];
-    let currentWeek = [];
-    const daysPerWeek = task.daysOfWeek.length;
-
-    for (let i = 0; i < task?.taskDays.length; i++) {
-      if (i > 0 && i % daysPerWeek === 0) {
-        weeks.push({ week: weeks.length + 1, days: currentWeek });
-        currentWeek = [];
-      }
-
-      currentWeek.push(task.taskDays[i]);
-    }
-
-    if (currentWeek.length > 0) {
-      weeks.push({ week: weeks.length + 1, days: currentWeek });
-    }
-
-    return weeks;
-  };
-
-  console.log(task.taskDays, "reg");
-
+  console.log(task.taskDays[0].date);
   return (
     <div>
       <div
@@ -110,7 +60,6 @@ const ChallengeInfo: React.FC = () => {
         {task.regularity === "Everyday" ? (
           <div className="mb-[75px] grid grid-cols-5 gap-0">
             {task.taskDays.map((day) => {
-              console.log(task.userCheckedDays, "tasks");
 
               const hasChecked = !task.userCheckedDays
                 ? false
@@ -129,7 +78,7 @@ const ChallengeInfo: React.FC = () => {
                     checkDay(task.id, day.dayCount, dayBeforeToday);
                     console.log(task.userCheckedDays);
                   }}
-                  className={`aspect-square rounded-full border border-black text-lg font-bold ${isToday && "bg-yellow-500"} ${hasFailed && "bg-red-500"} ${hasChecked && "bg-green-500"}`}
+                  className={`aspect-square rounded-full border border-black text-lg font-bold text-black ${isToday && "bg-yellow-500"} ${hasFailed && "bg-red-500"} ${hasChecked && "bg-green-500"}`}
                 >
                   <span>{day.dayCount}</span>
                 </button>
@@ -138,7 +87,7 @@ const ChallengeInfo: React.FC = () => {
           </div>
         ) : (
           <div className="">
-            {calculateWeeks().map((weekGroup, index) => (
+            {calculateWeeks(task).map((weekGroup, index) => (
               <div key={index} className="mb-5">
                 <h2 className="text-xl font-bold text-black">
                   НЕДЕЛЯ {weekGroup.week}
@@ -162,9 +111,9 @@ const ChallengeInfo: React.FC = () => {
                           checkDay(task.id, day.dayCount, dayBeforeToday);
                           console.log(task.userCheckedDays);
                         }}
-                        className={`aspect-square rounded-full border border-black text-lg font-bold ${isToday && "bg-yellow-500"} ${hasFailed && "bg-red-500"} ${hasChecked && "bg-green-500"}`}
+                        className={`aspect-square rounded-full border border-black text-lg font-bold text-black ${isToday && "bg-yellow-500"} ${hasFailed && "bg-red-500"} ${hasChecked && "bg-green-500"}`}
                       >
-                        <span>{day.dayCount}</span>
+                        <span className="">{day.dayCount}</span>
                       </button>
                     );
                   })}
@@ -179,15 +128,10 @@ const ChallengeInfo: React.FC = () => {
           <div className="flex justify-between text-black">
             <div className="text-xs font-light">ПРОЙДЕННЫХ ДНЕЙ</div>
             <div className="text-3xl font-extrabold">
-              {calculateDaysSinceStart(task.taskDays)}
+              {calculateDaysSinceStart(task.taskDays) < 0
+                ? 0
+                : calculateDaysSinceStart(task.taskDays)}
             </div>
-          </div>
-        </div>
-        <div className="mb-5">
-          <div className="mb-1 border border-black"></div>
-          <div className="flex justify-between text-black">
-            <div className="text-xs font-light">МАКСИМАЛЬНОЕ КОМБО</div>
-            <div className="text-3xl font-extrabold">0</div>
           </div>
         </div>
         <div className="mb-5">
@@ -199,12 +143,26 @@ const ChallengeInfo: React.FC = () => {
             </div>
           </div>
         </div>
+        <div className="mb-5">
+          <div className="mb-1 border border-black"></div>
+          <div className="flex justify-between text-black">
+            <div className="text-xs font-light">СЛЕДУЮЩИЙ ДЕНЬ</div>
+            <div className="text-3xl font-extrabold">
+              {calculateNextDay(
+                task.regularity,
+                new Date(),
+                task.taskDays,
+                task.userCheckedDays,
+              )}
+            </div>
+          </div>
+        </div>
         <div className="flex items-center justify-center pl-0 font-extrabold">
           <Link
             to={`/`}
             className="fixed bottom-[10px] flex h-[45px] w-[95vw] items-center justify-center rounded-lg bg-pink-500 p-5"
           >
-            <div className="">ПРОДОЛЖИТЬ</div>
+            <div>ПРОДОЛЖИТЬ</div>
           </Link>
         </div>
       </div>

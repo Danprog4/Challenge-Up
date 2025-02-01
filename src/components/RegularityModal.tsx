@@ -9,27 +9,53 @@ interface RegProps {
   setRegularity: (value: string) => void;
   daysOfWeek: number[];
   setDaysOfWeek: (value: number[]) => void;
+  setDuration?: (value: number) => void;
 }
+
+const daysOfWeekMap: { [key: number]: string } = {
+  1: "Понедельник",
+  2: "Вторник",
+  3: "Среда",
+  4: "Четверг",
+  5: "Пятница",
+  6: "Суббота",
+  7: "Воскресенье",
+  // 0: "Воскресенье",
+  // 1: "Понедельник",
+  // 2: "Вторник",
+  // 3: "Среда",
+  // 4: "Четврег",
+  // 5: "Пятница",
+  // 6: "Суббота",
+};
 
 export default function VaulDrawer({
   regularity,
   setRegularity,
   daysOfWeek,
   setDaysOfWeek,
+  setDuration,
 }: RegProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [outputDays, setOutputDays] = useState<string[]>([]);
+  const [outputDays, setOutputDays] = useState<string[]>(
+    daysOfWeek.map((day) => daysOfWeekMap[day]),
+  );
   const [tempOutputDays, setTempOutputDays] = useState<string[]>(outputDays);
   const [tempRegularity, setTempRegularity] = useState(regularity); // Храним временное состояние для регулярности
   const [tempDaysOfWeek, setTempDaysOfWeek] = useState(daysOfWeek); // Храним временные дни недели
 
   // Обработчик для изменения регулярности
   const handleChangleRegularity = (option: string) => {
+    if (setDuration) {
+      setDuration(option === "Everyday" ? 30 : 84);
+    }
+
+    setTempRegularity(option);
+
     if (option === "Everyday") {
       setTempDaysOfWeek([]);
       setTempOutputDays([]);
     }
-    setTempRegularity(option);
   };
 
   const handleToggle = (day: number, dayName: string) => {
@@ -57,6 +83,7 @@ export default function VaulDrawer({
 
   console.log(outputDays, "true");
   console.log(tempOutputDays, "flase");
+  console.log(regularity, "reg");
 
   return (
     <Drawer.Root
@@ -110,9 +137,8 @@ export default function VaulDrawer({
                     "Четверг",
                     "Пятница",
                     "Суббота",
-                    "Воскресенье",
                   ].map((dayName, index) => {
-                    const day = index;
+                    const day = index + 1;
                     return (
                       <div
                         key={day}
@@ -130,12 +156,23 @@ export default function VaulDrawer({
                       </div>
                     );
                   })}
+                  <div className="flex h-[40px] w-[90vw] items-center rounded-b-none border-b-2 border-gray-600 bg-gray-700 p-[10px] text-sm font-medium">
+                    <div
+                      className={cn(
+                        "text-gray-300",
+                        tempDaysOfWeek.includes(0) && "text-yellow-500",
+                      )}
+                      onClick={() => handleToggle(0, "Воскресенье")}
+                    >
+                      Воскресенье
+                    </div>
+                  </div>
                 </div>
               )}
               {tempDaysOfWeek.length > 0 && tempDaysOfWeek.length <= 6 && (
                 <div className="mt-3 w-[90vw] text-wrap text-start text-sm font-light">
-                  Задание будет повторяться в следующие <br /> дни:{" "}
-                  {tempOutputDays.join(", ").toLowerCase()}
+                  Задание будет повторяться в следующие <br /> дни:
+                  {tempOutputDays.join(", ").toLocaleLowerCase("ru")}
                 </div>
               )}
               {tempDaysOfWeek.length === 7 && tempRegularity !== "Everyday" && (

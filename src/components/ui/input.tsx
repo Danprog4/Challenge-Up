@@ -1,22 +1,65 @@
-import * as React from "react"
+import { cn } from "@/lib/utils";
 
-import { cn } from "@/lib/utils"
+type WithdrawInputProps = {
+  amountValue: string;
+  onAmountChange: (value: string) => void;
+  onFocus?: () => void;
+  unit?: string;
+  placeholder: string;
+};
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
-    return (
+// try set selection end
+export function NumericInput({
+  amountValue,
+  unit,
+  onAmountChange: setAmountValue,
+  onFocus,
+  placeholder,
+}: WithdrawInputProps) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let inputValue = e.target.value;
+
+    // Allow only digits (0-9) or empty string
+    if (/^\d*$/.test(inputValue)) {
+      // Process leading zeros only if input is not empty
+      if (inputValue !== "") {
+        // Remove leading zeros
+        inputValue = inputValue.replace(/^0+/, "");
+      }
+
+      setAmountValue(inputValue);
+    }
+  };
+
+  return (
+    <div
+      className={cn(
+        "flex h-10 items-baseline gap-1",
+        !amountValue && "items-end *:text-[20px]",
+      )}
+    >
       <input
-        type={type}
-        className={cn(
-          "flex h-9 w-full rounded-md border border-neutral-200 bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-neutral-950 placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:border-neutral-800 dark:file:text-neutral-50 dark:placeholder:text-neutral-400 dark:focus-visible:ring-neutral-300",
-          className
-        )}
-        ref={ref}
-        {...props}
+        type="text"
+        inputMode="decimal"
+        className="absolute z-10 w-[60vw] bg-transparent p-1.5 text-[20px] font-semibold text-white placeholder:text-white/65 focus-visible:outline-none"
+        value={amountValue}
+        placeholder={placeholder}
+        onInput={handleChange}
+        onFocus={onFocus}
       />
-    )
-  }
-)
-Input.displayName = "Input"
-
-export { Input }
+      <div
+        className={cn(
+          "max-w-[60vw] text-[20px] font-semibold opacity-0",
+          !amountValue && "self-end text-[20px] text-white/65",
+        )}
+      >
+        {amountValue || placeholder}
+      </div>
+      {amountValue && (
+        <span className="translate-y-0.5 p-1.5 text-[20px] font-semibold text-white">
+          {unit}
+        </span>
+      )}
+    </div>
+  );
+}

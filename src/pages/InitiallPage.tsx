@@ -1,47 +1,23 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import PlusImg from "../assets/images/plus-svgrepo-com.svg";
 import { useTasksStore } from "@/stores/TasksStore";
 import CheckImg from "../assets/images/icons8-галочка.svg";
-import { NumericInput } from "@/components/input";
 import AboutImg from "../assets/images/menu-symbol-of-three-parallel-lines-svgrepo-com (1).svg";
+import { calculateDaysSinceStart } from "@/lib/dateUtils";
+import { formatDate } from "@/lib/dateUtils";
+import { dayBeforeToday } from "@/lib/dateUtils";
+import { Months } from "@/monthes";
 
-const InitiallPage: React.FC = () => {
+const InitialPage: React.FC = () => {
   const { tasks, checkDay } = useTasksStore();
-  const [amount, setAmount] = useState("");
-
-  const calculateDaysSinceStart = (
-    taskDays: { date: string; dayCount: number }[],
-  ): number => {
-    if (taskDays.length === 0) {
-      return 0;
-    }
-
-    const startDate = new Date(taskDays[0].date);
-    const today = new Date();
-
-    const timeDifference = today.getTime() - startDate.getTime();
-    const daysSinceStart = Math.floor(timeDifference / (1000 * 3600 * 24));
-
-    return daysSinceStart + 1;
-  };
-
-  const formatDate = (date: Date): string => {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return `${year}-${month <= 9 ? "0" + month : month}-${day <= 9 ? "0" + day : day}`;
-  };
 
   const handleDayClick = (taskId: string, dayCount: number) => {
-    const nowDate = new Date();
-
-    const dayBeforeToday = (date: string): boolean => {
-      const dateToCompare = new Date(date);
-      return dateToCompare < nowDate;
-    };
-
     checkDay(taskId, dayCount, dayBeforeToday);
+  };
+
+  const getDateObject = (dateString: string | Date): Date => {
+    return dateString instanceof Date ? dateString : new Date(dateString);
   };
 
   return (
@@ -61,7 +37,7 @@ const InitiallPage: React.FC = () => {
             alt="Add"
           />
         </Link>
-      </div>{" "}
+      </div>
       {tasks.length === 0 ? (
         <div className="mt-10 flex h-screen flex-col items-center justify-center">
           <Link to={"new"}>
@@ -87,30 +63,42 @@ const InitiallPage: React.FC = () => {
       ) : (
         <div className="mt-24 flex flex-col items-center justify-center gap-2">
           {tasks.map((task, index) => {
+            const startDate = getDateObject(task.startDate);
             const daysSinceStart = calculateDaysSinceStart(task.taskDays);
+
             return (
               <Link
                 key={task.id}
                 to={`/challenge/${task.id}`}
-                className={`${task.color} flex h-[14vh] w-[90vw] items-center justify-between rounded-lg p-3 ${index + 1 === tasks.length && "mb-10"}`}
+                className={`${task.color} flex h-[16vh] w-[90vw] items-center justify-between rounded-lg p-3 pr-0 ${index + 1 === tasks.length && "mb-10"}`}
               >
                 <div className="flex flex-col">
                   <span className="text-lg font-extrabold text-black">
                     {task.title}
                   </span>
                   <div className="mt-5 flex">
-                    <span className="text-5xl font-extrabold">
+                    <span className="text-5xl font-extrabold text-black">
                       {daysSinceStart < 0 ? 0 : daysSinceStart}
                     </span>
                     <div className="ml-1 mt-3 flex-col text-sm font-medium text-black">
-                      <div className="mb-[-7px]">19 JAN</div>
-                      <div>/ {task.duration}</div>
+                      <div className="mb-[-7px]">
+                        {`${startDate.getDate()} `}
+                        {Months[startDate.getMonth() + 1]}
+                      </div>
+                      <div>
+                        /
+                        {`${
+                          task.regularity === "Everyday"
+                            ? task.duration + " дн."
+                            : task.duration / 7 + " нед."
+                        }`}
+                      </div>
                     </div>
                   </div>
                 </div>
                 <div>
                   <div
-                    className="relative flex h-[14vh] w-[30vw] items-center justify-center gap-2 rounded-full bg-black"
+                    className="relative flex aspect-square h-[16vh] items-center justify-center gap-2 rounded-full bg-black"
                     onClick={(event) => {
                       event.preventDefault();
                       event.stopPropagation();
@@ -125,7 +113,21 @@ const InitiallPage: React.FC = () => {
                           className="w-[30px]"
                         />
                       ) : (
-                        <span>DONE</span>
+                        <span>
+                          {startDate > new Date() ? (
+                            <div className="flex flex-col text-center">
+                              <span className="text-xs font-light leading-3">
+                                НАЧАЛО
+                              </span>
+                              <span>
+                                {`${startDate.getDate()} `}
+                                {Months[startDate.getMonth()]}
+                              </span>
+                            </div>
+                          ) : (
+                            <span>ГОТОВО</span>
+                          )}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -139,4 +141,4 @@ const InitiallPage: React.FC = () => {
   );
 };
 
-export default InitiallPage;
+export default InitialPage;

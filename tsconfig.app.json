@@ -24,5 +24,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "bgColors.tsx"]
+  "include": ["src", "bgColors.tsx", "monthes.ts"]
 }

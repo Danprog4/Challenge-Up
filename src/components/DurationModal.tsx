@@ -1,10 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Drawer } from "vaul";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { useCardsStore } from "@/stores/CardsStore";
-import { NumericInput } from "@/components/input";
+import { NumericInput } from "@/components/ui/input";
 
 interface DurProps {
   duration: number;
@@ -26,46 +26,57 @@ export default function VaulDrawer({
   const [isLong, setIsLong] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const card = categories
-    .flatMap((category) => category.items)
-    .find((item) => item.id === Number(id));
+  const card = React.useMemo(
+    () =>
+      categories
+        .flatMap((category) => category.items)
+        .find((item) => item.id === Number(id)),
+    [categories, id],
+  );
 
-  const presetDurations =
-    regularity === "Everyday"
-      ? card?.duration?.length
-        ? card.duration
-        : [7, 15, 30, 90]
-      : [14, 28, 56, 84];
+  const presetDurations = React.useMemo(
+    () =>
+      regularity === "Everyday"
+        ? card?.duration?.length
+          ? card.duration
+          : [7, 15, 30, 90]
+        : [14, 28, 56, 84],
+    [regularity, card],
+  );
 
-  // Обработка изменения пользовательского ввода длительности
+  useEffect(() => {
+    const isPreset = presetDurations.includes(duration);
+    setTempDuration(duration);
+    setInputDuration(
+      isPreset ? "" : String(duration / (regularity === "Everyday" ? 1 : 7)),
+    );
+    setIsCustomDuration(!isPreset);
+  }, [duration, presetDurations]);
+
   const handleDurationChange = (value: string) => {
     setInputDuration(value);
-    const durationValue = Number(value);
+    const weeksOrDays = Number(value);
 
-    // Проверяем пустое значение
     if (!value) {
       setIsLong(false);
       setTempDuration(0);
       return;
     }
 
-    // Устанавливаем флаг превышения максимального значения
-    if (regularity === "Everyday") {
-      setIsLong(durationValue > 300);
-    } else {
-      setIsLong(durationValue > 40);
-    }
+    const durationInDays =
+      regularity === "Everyday" ? weeksOrDays : weeksOrDays * 7;
+    const maxDuration = regularity === "Everyday" ? 300 : 280;
+    const isExceedingLimit = durationInDays > maxDuration;
+    setIsLong(isExceedingLimit);
 
-    // Обновляем временное значение только если оно не превышает лимит
-    if (!isLong) {
-      setTempDuration(durationValue);
+    if (!isExceedingLimit) {
+      setTempDuration(durationInDays);
     }
   };
 
-  // Сохранение изменений при нажатии кнопки "ГОТОВО"
   const handleSave = () => {
     const finalDuration = isCustomDuration
-      ? Number(inputDuration)
+      ? Number(inputDuration) * (regularity === "Everyday" ? 1 : 7)
       : tempDuration;
 
     if (!isLong && finalDuration > 0) {
@@ -74,31 +85,23 @@ export default function VaulDrawer({
     }
   };
 
+  const handleClose = () => {
+    setTempDuration(duration);
+    !presetDurations.includes(duration)
+      ? setInputDuration(
+          (duration / (regularity === "Everyday" ? 1 : 7)).toString(),
+        )
+      : setInputDuration("");
+    setIsCustomDuration(!presetDurations.includes(duration));
+    setIsLong(false);
+    setIsOpen(false);
+  };
+
   return (
-    <Drawer.Root
-      onClose={() => {
-        // Сброс к исходным значениям при закрытии
-        setTempDuration(duration);
-        setInputDuration(duration.toString());
-        // Определение режима ввода на основе текущего значения
-        if (!presetDurations.includes(duration) && !isLong) {
-          setIsCustomDuration(true);
-        } else {
-          setIsCustomDuration(false);
-          setIsLong(false);
-        }
-        setIsOpen(false);
-      }}
-      onOpenChange={setIsOpen}
-      open={isOpen}
-    >
+    <Drawer.Root onClose={handleClose} onOpenChange={setIsOpen} open={isOpen}>
       <Drawer.Trigger className="mt-2 flex w-[90vw] justify-between rounded-md bg-gray-700 p-[10px]">
         <span>Длительность</span>
-        {regularity === "Everyday" ? (
-          <span className="text-gray-400">{`${duration} дней >`}</span>
-        ) : (
-          <span className="text-gray-400">{`${Math.floor(duration / 7)} недель >`}</span>
-        )}
+        <span className="text-gray-400">{`${inputDuration || duration / (regularity === "Everyday" ? 1 : 7)} ${regularity === "Everyday" ? "дней" : "недель"} >`}</span>
       </Drawer.Trigger>
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/40" />
@@ -138,7 +141,7 @@ export default function VaulDrawer({
                   >
                     {regularity === "Everyday"
                       ? `${dur} дней`
-                      : `${Math.floor(dur / 7)} недель`}
+                      : `${dur / 7} недель`}
                   </RadioGroupItem>
                 ))}
                 <RadioGroupItem
@@ -159,12 +162,11 @@ export default function VaulDrawer({
                   <NumericInput
                     amountValue={inputDuration}
                     onAmountChange={handleDurationChange}
-                    unit={regularity === "Everyday" ? "days" : "weeks"}
+                    unit={regularity === "Everyday" ? "дн." : "нед."}
                     placeholder="Duration"
                   />
-
                   {isLong && (
-                    <div className="text-sm text-red-600">
+                    <div className="pl-2 text-sm text-red-600">
                       {regularity === "Everyday"
                         ? "Максимум 300 дней"
                         : "Максимум 40 недель"}

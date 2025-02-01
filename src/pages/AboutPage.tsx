@@ -23,6 +23,11 @@ const AboutPage: React.FC = () => {
           СОВЕТЫ <br></br>И ПОДСКАЗКИ
         </span>
       </Link>
+      <div className="flex h-[30vw] items-center justify-center rounded-3xl bg-white">
+        <span className="text-2xl font-extrabold text-black">
+          ПРИОБРЕСТИ ПОДПИСКУ
+        </span>
+      </div>
       <div className="flex">
         <a
           className="flex h-[50vw] w-[50vw] flex-col items-center justify-center rounded-3xl bg-blue-300"
@@ -47,20 +52,9 @@ const AboutPage: React.FC = () => {
         onClick={() =>
           toast("К сожалению, сейчас доступен только русский язык")
         }
-        className="flex h-[8vh] w-[100vw] items-center justify-center rounded-full bg-green-600 text-xl font-extrabold text-black"
+        className="mb-10 flex h-[8vh] w-[100vw] items-center justify-center rounded-full bg-green-600 text-xl font-extrabold text-black"
       >
         <span>ЯЗЫК</span>
-      </div>
-      <div className="mb-10 flex">
-        <div className="flex aspect-square w-[33vw] items-center justify-center rounded-full bg-white">
-          <span></span>
-        </div>
-        <div className="flex aspect-square w-[33vw] items-center justify-center rounded-full bg-white">
-          <span></span>
-        </div>
-        <div className="flex aspect-square w-[33vw] items-center justify-center rounded-full bg-white">
-          <span></span>
-        </div>
       </div>
       <footer className="mb-10 mr-5 mt-auto flex justify-between pl-5">
         <div className="text-2xl font-bold">TaskMaster</div>

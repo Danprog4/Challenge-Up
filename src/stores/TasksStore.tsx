@@ -20,12 +20,14 @@ export interface Task {
   daysOfWeek: number[];
   taskDays: Days[];
   userCheckedDays: string[];
+  startDate: Date;
 }
 
 interface TasksStore {
   tasks: Task[];
   addTask: (task: Task) => void;
   updateTask: (id: string, updatedTask: Task) => void;
+  deleteTask: (id: string) => void;
   getTaskbyId: (id: string) => Task | undefined;
   clearTasks: () => void;
   checkDay: (
@@ -52,6 +54,12 @@ const useTasksStore = create<TasksStore>()(
           tasks: state.tasks.map((task) =>
             task.id === id ? { ...task, ...updatedTask } : task,
           ),
+        }));
+      },
+
+      deleteTask: (id: string) => {
+        set((state) => ({
+          tasks: state.tasks.filter((task) => task.id !== id),
         }));
       },
 

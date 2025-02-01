@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { useCardsStore } from "../stores/CardsStore";
-import CrossImg from "../assets/images/Krestiksvgpng.ru_.svg";
+import CrossImg from "../assets/images/—Pngtree—vector cross icon_4254623.png";
 
 const Challenge: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,23 +14,25 @@ const Challenge: React.FC = () => {
     .find((item) => item.id === Number(id));
 
   return (
-    <div className="flex flex-col">
+    <div className="mb-20 flex w-full flex-col">
       <div className="relative">
         <img
           src={card?.imageUrl}
           alt={card?.title}
           className={`h-[450px] ${category?.color} rounded-b-3xl`}
         />
-        <Link to={"/"} className="absolute right-0 top-0 z-10 m-2 h-8 w-8">
+        <Link to={"/new"} className="fixed right-0 top-0 z-10 pr-[16px] pt-6">
           <img
             src={CrossImg}
             alt="cross"
-            className="rounded-full bg-white opacity-50"
+            className="h-[35px] w-[35px] rounded-full"
           />
         </Link>
         <div className="absolute inset-0 flex flex-col pl-[14px] pt-10 text-start">
-          <span className="text-sm text-white">Задание</span>
-          <span className="text-2xl font-bold text-black">{card?.title}</span>
+          <span className="text-sm text-black">Задание</span>
+          <span className="text-2xl font-bold text-black [text-shadow:_2px_2px_0_rgb(255_255_255),_-2px_-2px_0_rgb(255_255_255),_2px_-2px_0_rgb(255_255_255),_-2px_2px_0_rgb(255_255_255)]">
+            {card?.title}
+          </span>
         </div>
         <div className="absolute bottom-0 left-0 flex pb-4 pl-[14px]">
           {card?.duration?.map((dur) => (
@@ -54,40 +56,16 @@ const Challenge: React.FC = () => {
       </div>
       <div className="p-2">
         <p className="mb-7 mt-4 text-start text-lg text-gray-300">
-          Lorem ipsum dolor sit amet consectetur ernatur molestias tempore.
-          Rerum odio nam debitis. Aspernatur nam magni qui quas totam esse at
-          tempore veniam sit?
+          {card?.desc}
         </p>
         <div className="text-start">
           <span className="text-2xl font-bold">СОВЕТЫ И ПОДСКАЗКИ</span>
-          <div className="mt-3 flex gap-2 text-lg font-light text-gray-300">
-            <span className="inline-block font-bold text-white">-</span>
-            <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi,
-              eum.
-            </p>
-          </div>
-          <div className="mt-3 flex gap-2 text-lg font-light text-gray-300">
-            <span className="inline-block font-bold text-white">-</span>
-            <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi,
-              eum.
-            </p>
-          </div>
-          <div className="mt-3 flex gap-2 text-lg font-light text-gray-300">
-            <span className="inline-block font-bold text-white">-</span>
-            <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi,
-              eum.
-            </p>
-          </div>
-          <div className="mb-20 mt-3 flex gap-2 text-lg font-light text-gray-300">
-            <span className="inline-block font-bold text-white">-</span>
-            <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi,
-              eum.
-            </p>
-          </div>
+          {card?.hints?.map((hint) => (
+            <div className="mt-3 flex gap-2 text-lg font-light text-gray-300">
+              <span className="inline-block font-bold text-white">-</span>
+              <p>{hint}</p>
+            </div>
+          ))}
         </div>
       </div>
       <div className="flex items-center justify-center pl-0 font-extrabold">

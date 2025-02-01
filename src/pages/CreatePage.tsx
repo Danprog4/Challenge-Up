@@ -9,11 +9,10 @@ import StartModal from "@/components/StartModal";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { Colors } from "@/bgColors";
-import dayjs from "dayjs";
 import { Link } from "react-router-dom";
-import { Days } from "@/stores/TasksStore";
 import { toast } from "sonner";
-import { NumericInput } from "@/components/input";
+import { formatDate } from "@/lib/dateUtils";
+import { getDatesForDaysOfWeek } from "@/lib/dateUtils";
 
 const Create: React.FC = () => {
   const navigate = useNavigate();
@@ -32,12 +31,13 @@ const Create: React.FC = () => {
   const [isNotifications, setIsNotifications] = useState(false);
   const [notifications, setNotifications] = useState("");
   const [color, setColor] = useState(category?.color || "bg-pink-200");
-  const [duration, setDuration] = useState(30);
   const [regularity, setRegularity] = useState("Everyday");
+  const [duration, setDuration] = useState(regularity === "Everyday" ? 30 : 84);
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [daysOfWeek, setDaysOfWeek] = useState<number[]>([]);
 
   useEffect(() => {
+    console.log("regularity изменилось:", regularity);
     if (regularity === "Everyday") {
       setDuration(30);
     } else if (regularity === "Few times a week") {
@@ -55,62 +55,25 @@ const Create: React.FC = () => {
 
   const getNavigationPath = () => (card ? `/card/${card.id}` : "/");
 
-  const formatDate = (date: Date): string => {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return `${year}-${month <= 9 ? "0" + month : month}-${day <= 9 ? "0" + day : day}`;
-  };
-
-  const getDatesForDaysOfWeek = (
-    startDate: Date,
-    duration: number,
-    selectedDays: number[],
-  ) => {
-    const taskDays: Days[] = [];
-    let currentDate = dayjs(startDate);
-    let dayCount = 1;
-
-    if (regularity !== "Everyday") {
-      for (let i = 0; i < duration; i++) {
-        if (selectedDays.includes(currentDate.day())) {
-          taskDays.push({
-            date: currentDate.format("YYYY-MM-DD"),
-            dayCount,
-          });
-          dayCount++;
-        }
-        currentDate = currentDate.add(1, "day");
-      }
-    } else {
-      for (let i = 0; i < duration; i++) {
-        taskDays.push({
-          date: currentDate.format("YYYY-MM-DD"),
-          dayCount,
-        });
-        dayCount++;
-
-        currentDate = currentDate.add(1, "day");
-      }
-    }
-
-    return taskDays;
-  };
-
   const handleSave = () => {
     if (!title || title === "НАЗВАНИЕ ЗАДАНИЯ") {
-      toast("Write a title of your task");
+      toast("Напишите название задания");
       return;
     }
 
     const startDate = new Date(date ? date : Date.now());
 
     if (formatDate(startDate) < formatDate(new Date(Date.now()))) {
-      toast("Write a possible start time");
+      toast("Напишите возможное время (не в прошлом)");
       return;
     }
 
-    const taskDays = getDatesForDaysOfWeek(startDate, duration, daysOfWeek);
+    const taskDays = getDatesForDaysOfWeek(
+      startDate,
+      duration,
+      daysOfWeek,
+      regularity,
+    );
 
     const taskData = {
       id: crypto.randomUUID(),
@@ -124,16 +87,19 @@ const Create: React.FC = () => {
       daysOfWeek,
       taskDays: taskDays,
       userCheckedDays: [],
+      startDate,
     };
 
     addTask(taskData);
     navigate("/");
   };
 
+  console.log(regularity, "reg2");
+
   return (
     <div className="flex h-screen flex-col">
       <div className={`${color} h-[23%]`}>
-        <div className="relative mb-2 mt-5 flex w-full">
+        <div className="relative mb-2 mt-8 flex w-full">
           <Link to={getNavigationPath()} className="absolute inset-0">
             <img src={CrossImg} alt="cross" className="m-2 h-10 w-10" />
           </Link>
@@ -154,7 +120,7 @@ const Create: React.FC = () => {
           >
             <input
               type="text"
-              className="border-none bg-transparent text-black placeholder:text-gray-500 focus:outline-none"
+              className="w-full border-none bg-transparent text-black placeholder:text-gray-500 focus:outline-none"
               value={title}
               onChange={(e) => {
                 const inputValue = e.target.value.toUpperCase();
@@ -185,7 +151,7 @@ const Create: React.FC = () => {
           id={id}
           regularity={regularity}
         />
-        <StartModal date={date} setDate={setDate} />
+        <StartModal date={date} setDate={setDate} disabled={false} />
       </div>
       <div className="mt-4 flex flex-col pl-5 pt-4 text-start">
         <span className="mb-2 text-gray-300">Уведомления</span>
