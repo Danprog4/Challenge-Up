@@ -3,6 +3,7 @@ import Slider from "../components/Slider";
 import BackImg from "../assets/images/back-svgrepo-com (2).svg";
 import { Link, useNavigate } from "react-router-dom";
 import PlusImg from "../assets/images/plus-svgrepo-com.svg";
+import AddImg from "../assets/images/add-svgrepo-com.svg";
 
 const Challenges: React.FC = () => {
   return (
@@ -31,9 +32,9 @@ const Challenges: React.FC = () => {
         <div className="fixed bottom-[10px] z-20 flex h-[45px] w-[90vw] items-center justify-between rounded-lg bg-yellow-300 p-5">
           <Link to={"/card/create"}>
             <img
-              src={PlusImg}
+              src={AddImg}
               alt="Add"
-              className="h-[30px] w-[30px] -translate-x-2"
+              className="h-[20px] w-[20px] -translate-x-2"
             />
           </Link>
           <span className="text-sm text-black">СОЗДАЙ НОВОЕ ЗАДАНИЕ</span>

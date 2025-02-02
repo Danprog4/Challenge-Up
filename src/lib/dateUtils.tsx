@@ -90,38 +90,37 @@ export const calculateWeeks = (
 
   return weeks;
 };
-
 export const calculateNextDay = (
   regularity: string,
   currentDate: Date,
   taskDays: { date: string; dayCount: number }[],
   userCheckedDays: string[],
 ): string => {
+  if (taskDays.length === 0) return "Нету";
+
   const today = formatDate(new Date());
   const formattedCurrentDate = formatDate(currentDate);
-  const isAvailable =
-    !userCheckedDays.includes(formattedCurrentDate) &&
-    formattedCurrentDate === today;
 
-  if (isAvailable) {
-    return "Сегодня";
-  }
+  // Найдем ближайшую доступную дату
+  const nextAvailableDay = taskDays.find(
+    (task) =>
+      !userCheckedDays.includes(task.date) && task.date >= formattedCurrentDate,
+  );
 
-  if (regularity === "Everyday" && !isAvailable) {
-    return "Завтра";
-  }
+  if (!nextAvailableDay) return "Нету";
 
-  for (let i = 0; i < taskDays.length; i++) {
-    const taskDate = taskDays[i].date;
+  // Если ближайший доступный день — сегодня
+  if (nextAvailableDay.date === today) return "Сегодня";
 
-    if (taskDate > formattedCurrentDate) {
-      const daysUntilNext = Math.ceil(
-        (new Date(taskDate).getTime() - currentDate.getTime()) /
-          (1000 * 60 * 60 * 24),
-      );
-      return `Через ${daysUntilNext} ${daysUntilNext === 1 ? "день" : "дня"}`;
-    }
-  }
+  // Если ближайший доступный день — завтра
+  const tomorrow = formatDate(new Date(Date.now() + 24 * 60 * 60 * 1000));
+  if (nextAvailableDay.date === tomorrow) return "Завтра";
 
-  return "Нет доступных дней";
+  // Рассчитываем разницу в днях
+  const daysUntilNext = Math.ceil(
+    (Date.parse(nextAvailableDay.date) - currentDate.getTime()) /
+      (1000 * 60 * 60 * 24),
+  );
+
+  return `Через ${daysUntilNext} ${daysUntilNext === 1 ? "день" : "дня"}`;
 };

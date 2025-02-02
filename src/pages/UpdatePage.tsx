@@ -117,7 +117,7 @@ const UpdatePage: React.FC = () => {
     <div className="flex h-full flex-col">
       <div className={`${color} h-[20vh] pb-5`}>
         <div className="relative mb-2 mt-8 flex w-full">
-          <Link to="/" className="absolute inset-0">
+          <Link to={`/challenge/${task.id}`} className="absolute inset-0">
             <img src={CrossImg} alt="cross" className="m-2 h-10 w-10" />
           </Link>
           <span className="mt-[15.5px] w-full text-center text-black">

@@ -7,6 +7,7 @@ import { formatDate } from "@/lib/dateUtils";
 import { dayBeforeToday } from "@/lib/dateUtils";
 import { calculateWeeks } from "@/lib/dateUtils";
 import { calculateNextDay } from "@/lib/dateUtils";
+import SettingImg from "../assets/images/settings-svgrepo-com.svg";
 
 const ChallengeInfo: React.FC = () => {
   const { getTaskbyId, checkDay } = useTasksStore();
@@ -31,8 +32,8 @@ const ChallengeInfo: React.FC = () => {
             ←
           </Link>
           <span>Задание</span>
-          <Link to={`/update/${task.id}`} className="w-[30px]">
-            Sett
+          <Link to={`/update/${task.id}`} className="h-[30px]">
+            <img src={SettingImg} alt="Наст" className="w-[30px]" />
           </Link>
         </div>
         <div className="flex justify-between">
@@ -47,12 +48,14 @@ const ChallengeInfo: React.FC = () => {
                   : Math.ceil(Number(task.duration) / 7)}
               </div>
               <div className="mb-1 mt-[-5px] text-[10px] font-light">
-                {task.regularity === "Everyday" ? `DAYS` : `WEEKS`}
+                {task.regularity === "Everyday" ? `ДН.` : `НЕД.`}
               </div>
             </div>
             <div className="relative flex h-[70px] w-[70px] flex-col items-center justify-center rounded-full bg-pink-500">
-              <div className="text-center text-[10px] font-light">
-                {task.regularity}
+              <div className="text-wrap text-center text-[10px] font-light">
+                {task.regularity === "Everyday"
+                  ? "Каждый день"
+                  : "Несколько раз в неделю"}
               </div>
             </div>
           </div>
@@ -60,7 +63,6 @@ const ChallengeInfo: React.FC = () => {
         {task.regularity === "Everyday" ? (
           <div className="mb-[75px] grid grid-cols-5 gap-0">
             {task.taskDays.map((day) => {
-
               const hasChecked = !task.userCheckedDays
                 ? false
                 : task.userCheckedDays.includes(day.date);

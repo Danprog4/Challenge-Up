@@ -199,7 +199,7 @@ const Create: React.FC = () => {
       <div className="flex items-center justify-center pl-0 font-extrabold">
         <button
           onClick={handleSave}
-          className="fixed bottom-[10px] flex h-[45px] w-[95vw] items-center justify-center rounded-lg bg-pink-600 p-5"
+          className={`fixed bottom-[10px] flex h-[45px] w-[95vw] items-center justify-center rounded-lg bg-pink-600 p-5 ${title.length === 0 && "bg-gray-600"}`}
         >
           СОХРАНИТЬ
         </button>
